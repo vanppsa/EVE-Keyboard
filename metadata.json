@@ -1,0 +1,8 @@
+{
+  "name": "EVE Keyboard",
+  "description": "Teclado virtual para GNOME Wayland — sempre acima, arrastável, tema claro/escuro",
+  "uuid": "eve-keyboard@local",
+  "shell-version": ["50"],
+  "version": 1,
+  "session-modes": ["user"]
+}
