@@ -74,3 +74,23 @@
     font-size: 16px;
     padding: 0 4px;
 }
+
+.vkbd-resize-handle {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    background-color: rgba(25, 118, 210, 0.8);
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.vkbd-resize-handle:hover {
+    background-color: rgba(33, 150, 243, 0.9);
+}
+
+.vkbd-resize-active {
+    border: 2px dashed #1976d2;
+    box-shadow: 0 0 8px rgba(25, 118, 210, 0.6);
+}

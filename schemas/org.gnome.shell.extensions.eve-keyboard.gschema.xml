@@ -34,8 +34,12 @@
       <summary>Posição Y do painel (-1 = bottom center)</summary>
     </key>
     <key name="monitor-index" type="i">
-      <default>0</default>
-      <summary>Índice do monitor onde o teclado aparece</summary>
+        <default>0</default>
+        <summary>Índice do monitor onde o teclado aparece</summary>
+    </key>
+    <key name="panel-scale" type="d">
+        <default>1.0</default>
+        <summary>Escala do teclado (1.0 = 100%, 0.8 = 80%, 1.2 = 120%)</summary>
     </key>
   </schema>
 </schemalist>

@@ -116,6 +116,8 @@ export default class EveKeyboard extends Extension {
         this._keys = [];
         this._sids = [];
         this._dragState = null;
+        this._resizeState = null;
+        this._resizeMode = false;
         this._repeatTimer = null;
         this._deadKey = null;
         this._focusSids = [];
@@ -125,6 +127,8 @@ export default class EveKeyboard extends Extension {
 
         const sizeStr = this._settings.get_string('key-size');
         this._size = SIZES[sizeStr] || SIZES.M;
+        
+        this._scale = this._settings.get_double('panel-scale');
 
         this._shift = false;
         this._caps = false;
@@ -153,9 +157,12 @@ export default class EveKeyboard extends Extension {
         this._indicator = null;
         this._panel?.destroy();
         this._panel = null;
+        this._resizeHandle?.destroy();
+        this._resizeHandle = null;
         this._vkbd = null;
         this._keys = [];
         this._dragState = null;
+        this._resizeState = null;
         this._deadKey = null;
         this._settings = null;
     }
@@ -230,7 +237,7 @@ export default class EveKeyboard extends Extension {
         title.add_style_class_name('vkbd-accessible');
         bar.add_child(title);
 
-        const layoutBtn = this._hBtn(this._currentLayout.toUpperCase());
+        const layoutBtn = this._hBtn(this._currentLayout.toUpperCase(), 'Trocar layout');
         layoutBtn.add_style_class_name('vkbd-layout-btn');
         layoutBtn.connect('clicked', () => {
             this._currentLayout = this._currentLayout === 'us' ? 'br' : 'us';
@@ -239,8 +246,9 @@ export default class EveKeyboard extends Extension {
         });
         bar.add_child(layoutBtn);
 
+        const sizeMap = { 'S': 'Teclas pequenas', 'M': 'Teclas médias', 'L': 'Teclas grandes' };
         for (const [lbl, sz] of Object.entries(SIZES)) {
-            const b = this._hBtn(lbl);
+            const b = this._hBtn(lbl, sizeMap[lbl]);
             b.connect('clicked', () => {
                 this._size = sz;
                 this._settings.set_string('key-size', lbl);
@@ -249,11 +257,19 @@ export default class EveKeyboard extends Extension {
             bar.add_child(b);
         }
 
-        this._themeBtn = this._hBtn(this._dark ? '☀' : '🌙');
+        this._themeBtn = this._hBtn(this._dark ? '☀' : '🌙', 'Tema claro/escuro');
         this._themeBtn.connect('clicked', () => this._toggleTheme());
         bar.add_child(this._themeBtn);
 
-        const closeBtn = this._hBtn('✕');
+        this._dragBtn = this._hBtn('✥', 'Mover teclado');
+        this._dragBtn.connect('button-press-event', () => this._startDrag());
+        bar.add_child(this._dragBtn);
+
+        this._resizeBtn = this._hBtn('⤡', 'Redimensionar');
+        this._resizeBtn.connect('clicked', () => this._toggleResizeMode());
+        bar.add_child(this._resizeBtn);
+
+        const closeBtn = this._hBtn('✕', 'Fechar teclado');
         closeBtn.add_style_class_name('vkbd-close');
         closeBtn.connect('clicked', () => { this._panel.visible = false; });
         bar.add_child(closeBtn);
@@ -262,8 +278,10 @@ export default class EveKeyboard extends Extension {
         return bar;
     }
 
-    _hBtn(label) {
-        return new St.Button({ label, style_class: 'vkbd-hbtn', can_focus: false });
+    _hBtn(label, tooltip = '') {
+        const btn = new St.Button({ label, style_class: 'vkbd-hbtn', can_focus: false });
+        if (tooltip) btn.tooltip_text = tooltip;
+        return btn;
     }
 
     _mkKey(def) {
@@ -321,34 +339,46 @@ export default class EveKeyboard extends Extension {
         this._buildKbd();
     }
 
+    _startDrag() {
+        const [sx, sy] = global.get_pointer();
+        this._dragState = { sx, sy, ox: this._panel.x, oy: this._panel.y };
+    }
+
     _setupDrag() {
-        this._dragState = null;
-
-        this._header.connect('button-press-event', (_a, e) => {
-            const [sx, sy] = e.get_coords();
-            this._dragState = { sx, sy, ox: this._panel.x, oy: this._panel.y };
-            return Clutter.EVENT_STOP;
-        });
-
-        this._header.connect('button-release-event', () => {
-            this._savePosition();
-            this._dragState = null;
-            return Clutter.EVENT_PROPAGATE;
-        });
-
         this._sids.push(global.stage.connect('captured-event', (_a, e) => {
-            if (!this._dragState || !this._panel) return Clutter.EVENT_PROPAGATE;
+            if (!this._dragState && !this._resizeState) return Clutter.EVENT_PROPAGATE;
 
             const t = e.type();
             if (t === Clutter.EventType.MOTION) {
                 const [x, y] = e.get_coords();
-                const d = this._dragState;
-                this._panel.set_position(d.ox + x - d.sx, d.oy + y - d.sy);
+                
+                if (this._dragState) {
+                    const d = this._dragState;
+                    this._panel.set_position(d.ox + x - d.sx, d.oy + y - d.sy);
+                } else if (this._resizeState) {
+                    const d = this._resizeState;
+                    const dx = x - d.sx;
+                    const dy = y - d.sy;
+                    
+                    // Calcula nova escala baseada no movimento diagonal
+                    const diagonalMove = Math.sqrt(dx * dx + dy * dy);
+                    const diagonalMove2 = Math.sqrt(this._panel.width * this._panel.width + this._panel.height * this._panel.height);
+                    const scaleFactor = d.baseScale + (diagonalMove / diagonalMove2) * 0.5;
+                    
+                    // Limita escala entre 0.5 e 2.0
+                    this._scale = Math.max(0.5, Math.min(2.0, scaleFactor));
+                    this._applyScale();
+                    this._settings.set_double('panel-scale', this._scale);
+                }
                 return Clutter.EVENT_STOP;
             }
             if (t === Clutter.EventType.BUTTON_RELEASE) {
-                this._savePosition();
-                this._dragState = null;
+                if (this._dragState) {
+                    this._savePosition();
+                    this._dragState = null;
+                } else if (this._resizeState) {
+                    this._resizeState = null;
+                }
             }
             return Clutter.EVENT_PROPAGATE;
         }));
@@ -517,7 +547,7 @@ export default class EveKeyboard extends Extension {
 
     _applySize() {
         for (const { btn, def } of this._keys)
-            btn.set_size(this._size * (def.w ?? 1), this._size);
+            btn.set_size(this._size * (def.w ?? 1) * this._scale, this._size * this._scale);
 
         const mon = this._getTargetMonitor();
         this._panel.set_position(
@@ -526,6 +556,66 @@ export default class EveKeyboard extends Extension {
         );
         this._settings.set_int('panel-x', -1);
         this._settings.set_int('panel-y', -1);
+    }
+
+    _toggleResizeMode() {
+        this._resizeMode = !this._resizeMode;
+        this._dragBtn.reactive = !this._resizeMode;
+        this._themeBtn.reactive = !this._resizeMode;
+        
+        if (this._resizeMode) {
+            this._panel.add_style_class_name('vkbd-resize-active');
+            this._createResizeHandle();
+        } else {
+            this._panel.remove_style_class_name('vkbd-resize-active');
+            this._resizeHandle?.destroy();
+            this._resizeHandle = null;
+        }
+    }
+
+    _createResizeHandle() {
+        this._resizeHandle = new St.Button({
+            label: '⤵',
+            style_class: 'vkbd-resize-handle',
+            can_focus: false,
+            x_align: St.Align.END,
+            y_align: St.Align.END,
+            reactive: true,
+        });
+        this._resizeHandle.set_position(this._panel.width - 25, this._panel.height - 25);
+        this._panel.add_child(this._resizeHandle);
+        
+        this._resizeHandle.connect('button-press-event', () => this._startResize());
+    }
+
+    _startResize() {
+        const [sx, sy] = global.get_pointer();
+        this._resizeState = { 
+            sx, 
+            sy, 
+            baseScale: this._scale,
+            baseWidth: this._panel.width,
+            baseHeight: this._panel.height
+        };
+    }
+
+    _applyScale() {
+        if (!this._panel) return;
+        
+        this._panel.set_scale(this._scale, this._scale);
+        
+        // Atualiza tamanho das teclas proporcionalmente
+        for (const { btn, def } of this._keys) {
+            const scaledSize = this._size * this._scale;
+            btn.set_size(scaledSize * (def.w ?? 1), scaledSize);
+        }
+        
+        if (this._resizeHandle) {
+            this._resizeHandle.set_position(
+                this._panel.width - 25, 
+                this._panel.height - 25
+            );
+        }
     }
 
     _buildIndicator() {
