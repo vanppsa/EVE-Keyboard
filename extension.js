@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Meta from 'gi://Meta';
 import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -134,7 +133,7 @@ export default class EveKeyboard extends Extension {
 
         this._currentLayout = this._resolveLayout();
 
-        const backend = Meta.get_backend();
+        const backend = global.stage.context.get_backend();
         const seat = backend.get_default_seat();
         this._vkbd = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
 

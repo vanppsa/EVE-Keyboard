@@ -4,5 +4,6 @@
   "uuid": "eve-keyboard@local",
   "shell-version": ["50"],
   "version": 1,
-  "session-modes": ["user"]
+  "session-modes": ["user"],
+  "settings-schema": "org.gnome.shell.extensions.eve-keyboard"
 }
