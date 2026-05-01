@@ -52,7 +52,7 @@ const LAYOUTS = {
         name: 'ABNT2 BR',
         rows: [
             [
-                { l: "'", k: 39, s: 34 }, { l: '1', k: 49, s: 33 }, { l: '2', k: 50, s: 64 },
+                { l: '`', k: 96, s: 126 }, { l: '1', k: 49, s: 33 }, { l: '2', k: 50, s: 64 },
                 { l: '3', k: 51, s: 35 }, { l: '4', k: 52, s: 36 }, { l: '5', k: 53, s: 37 },
                 { l: '6', k: 54, s: 94 }, { l: '7', k: 55, s: 38 }, { l: '8', k: 56, s: 42 },
                 { l: '9', k: 57, s: 40 }, { l: '0', k: 48, s: 41 }, { l: '-', k: 45, s: 95 },
@@ -117,8 +117,8 @@ export default class EveKeyboard extends Extension {
         this._sids = [];
         this._dragState = null;
         this._resizeState = null;
-        this._resizeMode = false;
         this._repeatTimer = null;
+        this._repeatId = 0;
         this._deadKey = null;
         this._focusSids = [];
 
@@ -217,15 +217,17 @@ export default class EveKeyboard extends Extension {
         if (savedX >= 0 && savedY >= 0) {
             this._panel.set_position(savedX, savedY);
         } else {
+            const [width] = this._panel.get_preferred_width(-1);
             this._panel.set_position(
-                Math.round((mon.width - this._panel.width) / 2),
+                Math.round((mon.width - width) / 2),
                 mon.height - POS_Y_OFFSET
             );
         }
 
+        this._panel.visible = false;
+        this._applyScale();
         this._setupDrag();
     }
-
     _buildHeader() {
         const bar = new St.BoxLayout({ style_class: 'vkbd-header', reactive: true });
 
@@ -266,7 +268,7 @@ export default class EveKeyboard extends Extension {
         bar.add_child(this._dragBtn);
 
         this._resizeBtn = this._hBtn('⤡', 'Redimensionar');
-        this._resizeBtn.connect('clicked', () => this._toggleResizeMode());
+        this._resizeBtn.connect('button-press-event', () => this._startResize());
         bar.add_child(this._resizeBtn);
 
         const closeBtn = this._hBtn('✕', 'Fechar teclado');
@@ -296,17 +298,21 @@ export default class EveKeyboard extends Extension {
 
         btn.connect('button-press-event', () => {
             this._stopRepeat();
+            const sid = ++this._repeatId;
             this._onKey(def);
+
             if (!def.sp && !def.dd) {
-                this._repeatDef = def;
                 this._repeatTimer = GLib.timeout_add(
                     GLib.PRIORITY_DEFAULT,
                     REPEAT_DELAY_MS,
                     () => {
+                        if (this._repeatId !== sid) return GLib.SOURCE_REMOVE;
+                        
                         this._repeatTimer = GLib.timeout_add(
                             GLib.PRIORITY_DEFAULT,
                             REPEAT_INTERVAL_MS,
                             () => {
+                                if (this._repeatId !== sid) return GLib.SOURCE_REMOVE;
                                 this._emitKey(def);
                                 return GLib.SOURCE_CONTINUE;
                             }
@@ -315,9 +321,13 @@ export default class EveKeyboard extends Extension {
                     }
                 );
             }
-            return Clutter.EVENT_PROPAGATE;
+            return Clutter.EVENT_STOP;
         });
         btn.connect('button-release-event', () => {
+            this._stopRepeat();
+            return Clutter.EVENT_STOP;
+        });
+        btn.connect('leave-event', () => {
             this._stopRepeat();
             return Clutter.EVENT_PROPAGATE;
         });
@@ -325,6 +335,7 @@ export default class EveKeyboard extends Extension {
     }
 
     _stopRepeat() {
+        this._repeatId++;
         if (this._repeatTimer) {
             GLib.source_remove(this._repeatTimer);
             this._repeatTimer = null;
@@ -358,15 +369,9 @@ export default class EveKeyboard extends Extension {
                 } else if (this._resizeState) {
                     const d = this._resizeState;
                     const dx = x - d.sx;
-                    const dy = y - d.sy;
                     
-                    // Calcula nova escala baseada no movimento diagonal
-                    const diagonalMove = Math.sqrt(dx * dx + dy * dy);
-                    const diagonalMove2 = Math.sqrt(this._panel.width * this._panel.width + this._panel.height * this._panel.height);
-                    const scaleFactor = d.baseScale + (diagonalMove / diagonalMove2) * 0.5;
-                    
-                    // Limita escala entre 0.5 e 2.0
-                    this._scale = Math.max(0.5, Math.min(2.0, scaleFactor));
+                    // Ajusta escala baseada no movimento horizontal (300px = 1.0 de variação)
+                    this._scale = Math.max(0.5, Math.min(2.0, d.baseScale + (dx / 300)));
                     this._applyScale();
                     this._settings.set_double('panel-scale', this._scale);
                 }
@@ -377,6 +382,7 @@ export default class EveKeyboard extends Extension {
                     this._savePosition();
                     this._dragState = null;
                 } else if (this._resizeState) {
+                    this._panel.remove_style_class_name('vkbd-resize-active');
                     this._resizeState = null;
                 }
             }
@@ -458,15 +464,18 @@ export default class EveKeyboard extends Extension {
     }
 
     _emitKey(def) {
-        const t = GLib.get_monotonic_time();
+        let t = Math.floor(GLib.get_monotonic_time() / 1000);
 
-        if (this._ctrl) this._vkbd.notify_keyval(t, 65507, Clutter.KeyState.PRESSED);
-        if (this._alt) this._vkbd.notify_keyval(t, 65513, Clutter.KeyState.PRESSED);
+        if (this._ctrl) this._vkbd.notify_keyval(t++, 65507, Clutter.KeyState.PRESSED);
+        if (this._alt) this._vkbd.notify_keyval(t++, 65513, Clutter.KeyState.PRESSED);
 
         let kv = def.k;
-        const isLetter = kv >= 97 && kv <= 122;
+        const isLetter = (kv >= 97 && kv <= 122) || kv === 231; // a-z ou ç
         if (isLetter) {
-            if (this._shift !== this._caps) kv -= 32;
+            if (this._shift !== this._caps) {
+                if (kv === 231) kv = 199; // Ç
+                else kv -= 32;
+            }
         } else if (this._shift && def.s != null) {
             kv = def.s;
         }
@@ -474,8 +483,8 @@ export default class EveKeyboard extends Extension {
         if (this._deadKey && DEAD_KEY_MAP[this._deadKey]) {
             const composed = this._lookupDead(this._deadKey, kv);
             if (composed) {
-                this._vkbd.notify_keyval(t, composed, Clutter.KeyState.PRESSED);
-                this._vkbd.notify_keyval(t, composed, Clutter.KeyState.RELEASED);
+                this._vkbd.notify_keyval(t++, composed, Clutter.KeyState.PRESSED);
+                this._vkbd.notify_keyval(t++, composed, Clutter.KeyState.RELEASED);
                 this._deadKey = null;
                 this._releaseModifiers(t);
                 return;
@@ -483,8 +492,8 @@ export default class EveKeyboard extends Extension {
             this._deadKey = null;
         }
 
-        this._vkbd.notify_keyval(t, kv, Clutter.KeyState.PRESSED);
-        this._vkbd.notify_keyval(t, kv, Clutter.KeyState.RELEASED);
+        this._vkbd.notify_keyval(t++, kv, Clutter.KeyState.PRESSED);
+        this._vkbd.notify_keyval(t++, kv, Clutter.KeyState.RELEASED);
 
         this._releaseModifiers(t);
     }
@@ -547,85 +556,44 @@ export default class EveKeyboard extends Extension {
 
     _applySize() {
         for (const { btn, def } of this._keys)
-            btn.set_size(this._size * (def.w ?? 1) * this._scale, this._size * this._scale);
+            btn.set_size(this._size * (def.w ?? 1), this._size);
 
         const mon = this._getTargetMonitor();
         this._panel.set_position(
             Math.round((mon.width - this._panel.width) / 2),
             mon.height - POS_Y_OFFSET
         );
-        this._settings.set_int('panel-x', -1);
-        this._settings.set_int('panel-y', -1);
-    }
-
-    _toggleResizeMode() {
-        this._resizeMode = !this._resizeMode;
-        this._dragBtn.reactive = !this._resizeMode;
-        this._themeBtn.reactive = !this._resizeMode;
-        
-        if (this._resizeMode) {
-            this._panel.add_style_class_name('vkbd-resize-active');
-            this._createResizeHandle();
-        } else {
-            this._panel.remove_style_class_name('vkbd-resize-active');
-            this._resizeHandle?.destroy();
-            this._resizeHandle = null;
-        }
-    }
-
-    _createResizeHandle() {
-        this._resizeHandle = new St.Button({
-            label: '⤵',
-            style_class: 'vkbd-resize-handle',
-            can_focus: false,
-            x_align: St.Align.END,
-            y_align: St.Align.END,
-            reactive: true,
-        });
-        this._resizeHandle.set_position(this._panel.width - 25, this._panel.height - 25);
-        this._panel.add_child(this._resizeHandle);
-        
-        this._resizeHandle.connect('button-press-event', () => this._startResize());
+        this._savePosition();
     }
 
     _startResize() {
         const [sx, sy] = global.get_pointer();
+        this._panel.add_style_class_name('vkbd-resize-active');
         this._resizeState = { 
             sx, 
             sy, 
             baseScale: this._scale,
-            baseWidth: this._panel.width,
-            baseHeight: this._panel.height
         };
     }
 
     _applyScale() {
         if (!this._panel) return;
-        
         this._panel.set_scale(this._scale, this._scale);
-        
-        // Atualiza tamanho das teclas proporcionalmente
-        for (const { btn, def } of this._keys) {
-            const scaledSize = this._size * this._scale;
-            btn.set_size(scaledSize * (def.w ?? 1), scaledSize);
-        }
-        
-        if (this._resizeHandle) {
-            this._resizeHandle.set_position(
-                this._panel.width - 25, 
-                this._panel.height - 25
-            );
-        }
     }
 
     _buildIndicator() {
-        this._indicator = new PanelMenu.Button(0.0, 'EVE Keyboard', false);
+        this._indicator = new PanelMenu.Button(0.0, 'EVE Keyboard', true);
 
         const icon = new St.Label({ text: '⌨', style_class: 'vkbd-panel-icon' });
         this._indicator.add_child(icon);
 
         this._indicator.connect('button-press-event', () => {
-            if (this._panel) this._panel.visible = !this._panel.visible;
+            if (this._panel) {
+                this._panel.visible = !this._panel.visible;
+                if (this._panel.visible)
+                    this._panel.raise_top();
+            }
+            return Clutter.EVENT_STOP;
         });
 
         Main.panel.addToStatusArea('eve-keyboard', this._indicator);
