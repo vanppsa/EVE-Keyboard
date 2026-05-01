@@ -1,122 +1,90 @@
-## EVE Keyboard — GNOME Shell Extension
+# EVE Keyboard — Teclado Virtual para GNOME Shell
 
-Teclado virtual otimizado para **GNOME 50 / Wayland** (Fedora 44+).
+O **EVE Keyboard** é uma extensão de teclado virtual de alto desempenho para o GNOME Shell (versão 47/50+), projetada especificamente para o **Fedora 44** e sessões **Wayland**.
 
-Roda *dentro* do compositor como extensão:
-- Fica naturalmente acima de todas as janelas.
-- Injeta teclas via `Clutter.VirtualInputDevice`, garantindo compatibilidade total com Wayland.
-- Draggável pelo header com posição salva entre sessões.
-- **Redimensionamento dinâmico**: arraste o botão de redimensionamento para ajustar a escala livremente (0.5x a 2.0x).
-- **Tema claro/escuro**: interface polida que segue o estilo do sistema.
-- **Layouts**: QWERTY US e ABNT2 BR com detecção automática.
-- **Suporte a 'ç'**: suporte completo ao caractere 'ç' e 'Ç' no layout brasileiro.
-- **Dead keys**: composição de acentos (ã, á, â, ä, etc.).
-- **Auto-repeat**: repetição inteligente de teclas ao segurar.
-- **Auto-show**: aparece automaticamente ao focar campos de texto (configurável).
-- **Multi-monitor**: suporte para múltiplos monitores com posicionamento inteligente.
-- **Preferências**: interface moderna via GTK4/Libadwaita.
+Diferente de teclados baseados em janelas comuns, o EVE Keyboard roda diretamente dentro do compositor (GNOME Shell), garantindo que ele sempre apareça sobre qualquer janela, tela de bloqueio ou menu do sistema, utilizando a API Clutter para injeção de input de baixo nível.
 
 ---
 
-## Requisitos
+## ✨ Destaques
 
-- GNOME Shell 50.x ou superior.
-- Sessão Wayland.
-
----
-
-## Estrutura de Pastas
-
-```
-eve-keyboard@local/
-├── metadata.json
-├── extension.js
-├── prefs.js
-├── stylesheet.css
-└── schemas/
-    └── org.gnome.shell.extensions.eve-keyboard.gschema.xml
-```
+- 🚀 **Otimizado para Wayland**: Injeção de teclas via `VirtualInputDevice`.
+- 📐 **Redimensionamento Livre**: Arraste o canto do teclado para ajustar a escala (0.5x a 2.0x).
+- 🖱️ **Posicionamento Persistente**: Arraste e posicione onde quiser; o teclado lembra o local na próxima sessão.
+- 🎨 **Interface Moderna**: Segue o design do GNOME com temas claro e escuro automáticos.
+- ⌨️ **Layouts Híbridos**: Suporte completo para **US (QWERTY)** e **BR (ABNT2)** com dead keys (acentuação).
+- ⚡ **Auto-Show**: O teclado aparece automaticamente ao focar em campos de texto (opcional).
 
 ---
 
-## Instalação
+## 🛠️ Instalação no Fedora 44
 
-Copie a pasta para o diretório de extensões do usuário:
+### 1. Dependências do Sistema
+Certifique-se de ter as ferramentas necessárias para compilar os schemas de configuração:
 
 ```bash
-mkdir -p ~/.local/share/gnome-shell/extensions/eve-keyboard@local
-cp -r . ~/.local/share/gnome-shell/extensions/eve-keyboard@local/
+sudo dnf install glib2-devel gnome-extensions-app
 ```
 
-Compile os schemas (necessário para as configurações funcionarem):
+### 2. Instalação Rápida (Script)
+Execute o bloco abaixo no seu terminal para baixar, instalar e configurar a extensão automaticamente:
 
 ```bash
-glib-compile-schemas ~/.local/share/gnome-shell/extensions/eve-keyboard@local/schemas/
+# Definir o ID da extensão
+UUID="eve-keyboard@local"
+DEST="$HOME/.local/share/gnome-shell/extensions/$UUID"
+
+# Criar diretórios e copiar arquivos
+mkdir -p "$DEST"
+cp -r . "$DEST/"
+
+# Compilar os schemas de configuração
+glib-compile-schemas "$DEST/schemas/"
+
+# Ativar a extensão
+gnome-extensions enable "$UUID"
 ```
 
-**Ative a extensão:**
-
-```bash
-gnome-extensions enable eve-keyboard@local
-```
-
-*Nota: No Wayland, pode ser necessário reiniciar a sessão (logout/login).*
+### 3. Reinicie o GNOME Shell
+Como o EVE Keyboard é uma extensão do sistema, é necessário reiniciar a sessão para que o Shell carregue o novo código:
+- Salve seu trabalho e faça **Logout** e **Login** novamente.
 
 ---
 
-## Uso
+## 🚀 Como Usar
 
-- **Mostrar/Esconder**: clique no ícone **⌨** no painel superior.
-- **Arrastar**: segure o ícone de arrastar no header para mover o teclado.
-- **Redimensionar**: segure e arraste o botão de redimensionamento (ícone de seta) para ajustar o tamanho.
-- **Tema**: alterne entre claro e escuro diretamente no header.
-- **Layout**: alterne entre US e BR rapidamente.
-- **Modificadores Sticky**: Shift, Ctrl e Alt permanecem ativos para a próxima tecla.
-- **Dead Keys**: use acentos normalmente (ex: `~` + `a` = `ã`).
+1. **Ativação**: Um ícone de teclado (**⌨**) aparecerá no painel superior (systray).
+2. **Mover**: Clique e segure no ícone de "setas" no cabeçalho do teclado para arrastá-lo.
+3. **Escalar**: Use o botão de redimensionamento no canto inferior direito para ajustar o tamanho.
+4. **Troca de Layout**: Clique no indicador de idioma (`US` / `BR`) para alternar instantaneamente.
+5. **Acentuação**: Funciona como um teclado físico (ex: pressione `~` e depois `A` para obter `ã`).
 
 ### Preferências
-
-Acesse via botão direito no ícone do painel ou pelo comando:
-
+Você pode ajustar o comportamento do **Auto-Show**, escala padrão e comportamentos de teclas abrindo as configurações:
 ```bash
 gnome-extensions prefs eve-keyboard@local
 ```
 
 ---
 
-## Desenvolvimento e Debug
+## 👨‍💻 Desenvolvimento e Contribuição
 
-Para testar sem sair da sessão atual (Nested Shell):
+Se você deseja modificar o teclado ou adicionar novos layouts:
 
-```bash
-dbus-run-session -- gnome-shell --nested &
-```
-
-Visualizar logs em tempo real:
-
+**Logs de Erro:**
 ```bash
 journalctl -f -o cat /usr/bin/gnome-shell | grep -i eve
 ```
 
----
-
-## Configurações (GSettings)
-
-| Chave | Tipo | Padrão | Descrição |
-|-------|------|--------|-----------|
-| `theme` | string | `'dark'` | `'dark'` ou `'light'` |
-| `panel-scale` | double | `1.0` | Escala do teclado (0.5 a 2.0) |
-| `layout` | string | `'auto'` | `'auto'`, `'us'` ou `'br'` |
-| `auto-show` | bool | `true` | Mostrar ao focar campo de texto |
-| `sticky-modifiers` | bool | `true` | Modificadores soltam após 1 tecla |
-| `panel-x` | int | `-1` | Posição X salva |
-| `panel-y` | int | `-1` | Posição Y salva |
+**Testar em Sessão Aninhada (sem deslogar):**
+```bash
+dbus-run-session -- gnome-shell --nested &
+```
 
 ---
 
-## Roadmap
+## 📄 Licença
+Este projeto está sob a licença MIT. Sinta-se à vontade para usar, modificar e distribuir.
 
-- Suporte a mais layouts (AZERTY, Dvorak).
-- Gestos para esconder o teclado.
-- Personalização avançada de cores.
-- Suporte a emojis.
+---
+*Desenvolvido para a comunidade GNOME.*
