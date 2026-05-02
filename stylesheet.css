@@ -104,6 +104,13 @@
     background-color: rgba(33, 150, 243, 0.9);
 }
 
+.vkbd-content {
+    spacing: 12px;
+}
+.vkbd-numpad {
+    spacing: 3px;
+}
+
 .vkbd-resize-active {
     border: 2px dashed #1976d2;
     box-shadow: 0 0 8px rgba(25, 118, 210, 0.6);

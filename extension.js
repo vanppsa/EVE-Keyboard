@@ -14,7 +14,9 @@ const REPEAT_INTERVAL_MS = 80;
 const LAYOUTS = {
     us: {
         name: 'QWERTY US',
-        rows: [
+        hasNumpad: true,
+        hasNav: true,
+        mainRows: [
             [
                 { l: '`', k: 96, s: 126 }, { l: '1', k: 49, s: 33 }, { l: '2', k: 50, s: 64 },
                 { l: '3', k: 51, s: 35 }, { l: '4', k: 52, s: 36 }, { l: '5', k: 53, s: 37 },
@@ -47,10 +49,37 @@ const LAYOUTS = {
                 { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
             ],
         ],
+        navRows: [
+            [
+                { l: 'Ins', k: 65379 }, { l: 'Home', k: 65367 }, { l: 'PgUp', k: 65365 },
+            ],
+            [
+                { l: 'Del', k: 65535 }, { l: 'End', k: 65361 }, { l: 'PgDn', k: 65366 },
+            ],
+        ],
+        numpadRows: [
+            [
+                { l: 'Num', k: 65407, sp: 'numlock' }, { l: '/', k: 65429 }, { l: '*', k: 65430 }, { l: '-', k: 65431 },
+            ],
+            [
+                { l: '7', k: 65423 }, { l: '8', k: 65424 }, { l: '9', k: 65425 }, { l: '+', k: 65421 },
+            ],
+            [
+                { l: '4', k: 65420 }, { l: '5', k: 65421 }, { l: '6', k: 65422 }, { l: '', k: 0, w: 1 },
+            ],
+            [
+                { l: '1', k: 65417 }, { l: '2', k: 65418 }, { l: '3', k: 65419 }, { l: 'Enter', k: 65409, w: 1, h: 2 },
+            ],
+            [
+                { l: '0', k: 65416, w: 2 }, { l: '.', k: 65426 }, { l: '', k: 0, w: 1 },
+            ],
+        ],
     },
     br: {
         name: 'ABNT2 BR',
-        rows: [
+        hasNumpad: true,
+        hasNav: true,
+        mainRows: [
             [
                 { l: '`', k: 96, s: 126 }, { l: '1', k: 49, s: 33 }, { l: '2', k: 50, s: 64 },
                 { l: '3', k: 51, s: 35 }, { l: '4', k: 52, s: 36 }, { l: '5', k: 53, s: 37 },
@@ -83,6 +112,31 @@ const LAYOUTS = {
                 { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
             ],
         ],
+        navRows: [
+            [
+                { l: 'Ins', k: 65379 }, { l: 'Home', k: 65367 }, { l: 'PgUp', k: 65365 },
+            ],
+            [
+                { l: 'Del', k: 65535 }, { l: 'End', k: 65361 }, { l: 'PgDn', k: 65366 },
+            ],
+        ],
+        numpadRows: [
+            [
+                { l: 'Num', k: 65407, sp: 'numlock' }, { l: '/', k: 65429 }, { l: '*', k: 65430 }, { l: '-', k: 65431 },
+            ],
+            [
+                { l: '7', k: 65423 }, { l: '8', k: 65424 }, { l: '9', k: 65425 }, { l: '+', k: 65421 },
+            ],
+            [
+                { l: '4', k: 65420 }, { l: '5', k: 65421 }, { l: '6', k: 65422 }, { l: '', k: 0, w: 1 },
+            ],
+            [
+                { l: '1', k: 65417 }, { l: '2', k: 65418 }, { l: '3', k: 65419 }, { l: 'Enter', k: 65409, w: 1, h: 2 },
+            ],
+            [
+                { l: '0', k: 65416, w: 2 }, { l: '.', k: 65426 }, { l: '', k: 0, w: 1 },
+            ],
+        ],
     },
 };
 
@@ -113,27 +167,8 @@ const OPACITY_LEVELS = [1.0, 0.75, 0.50, 0.25];
 
 const LAYOUT_MODE_LABELS = ['Full', 'TKL', '75%', 'Minimal'];
 
-const LAYOUT_MODES = {
-    full: {
-        us: 'us',
-        br: 'br',
-    },
-    tkl: {
-        us: 'us-tkl',
-        br: 'br-tkl',
-    },
-    '75': {
-        us: 'us-75',
-        br: 'br-75',
-    },
-    minimal: {
-        us: 'us-min',
-        br: 'br-min',
-    },
-};
-
-const MODE_LAYOUTS = {
-    'us-tkl': {
+const TKL_LAYOUTS = {
+    us: {
         name: 'TKL US',
         rows: [
             [
@@ -142,12 +177,14 @@ const MODE_LAYOUTS = {
                 { l: '6', k: 54, s: 94 }, { l: '7', k: 55, s: 38 }, { l: '8', k: 56, s: 42 },
                 { l: '9', k: 57, s: 40 }, { l: '0', k: 48, s: 41 }, { l: '-', k: 45, s: 95 },
                 { l: '=', k: 61, s: 43 }, { l: '⌫', k: 65288, w: 2 },
+                { l: 'Ins', k: 65379 }, { l: 'Home', k: 65367 }, { l: 'PgUp', k: 65365 },
             ],
             [
                 { l: 'Tab', k: 65289, w: 1.5 }, { l: 'Q', k: 113 }, { l: 'W', k: 119 },
                 { l: 'E', k: 101 }, { l: 'R', k: 114 }, { l: 'T', k: 116 }, { l: 'Y', k: 121 },
                 { l: 'U', k: 117 }, { l: 'I', k: 105 }, { l: 'O', k: 111 }, { l: 'P', k: 112 },
                 { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '', k: 92, s: 124, w: 1.5 },
+                { l: 'Del', k: 65535 }, { l: 'End', k: 65361 }, { l: 'PgDn', k: 65366 },
             ],
             [
                 { l: 'Caps', k: 65509, w: 1.75, sp: 'caps' }, { l: 'A', k: 97 }, { l: 'S', k: 115 },
@@ -159,20 +196,17 @@ const MODE_LAYOUTS = {
                 { l: 'Shift', k: 65505, w: 2.25, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
                 { l: 'C', k: 99 }, { l: 'V', k: 118 }, { l: 'B', k: 98 }, { l: 'N', k: 110 },
                 { l: 'M', k: 109 }, { l: ',', k: 44, s: 60 }, { l: '.', k: 46, s: 62 },
-                { l: '/', k: 47, s: 63 },
-                { l: 'Shift', k: 65506, w: 1.75, sp: 'shift' },
-                { l: '↑', k: 65362 }, { l: '↓', k: 65364 },
+                { l: '/', k: 47, s: 63 }, { l: 'Shift', k: 65506, w: 2.75, sp: 'shift' },
             ],
             [
-                { l: 'Ctrl', k: 65507, w: 1.25, sp: 'ctrl' },
-                { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
-                { l: 'Space', k: 32, w: 4.5 },
-                { l: 'Alt', k: 65514, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.25 },
+                { l: 'Ctrl', k: 65507, w: 1.5, sp: 'ctrl' }, { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
+                { l: 'Space', k: 32, w: 6.5 },
+                { l: 'Alt', k: 65514, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.5 },
                 { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
             ],
         ],
     },
-    'br-tkl': {
+    br: {
         name: 'TKL BR',
         rows: [
             [
@@ -181,12 +215,14 @@ const MODE_LAYOUTS = {
                 { l: '6', k: 54, s: 94 }, { l: '7', k: 55, s: 38 }, { l: '8', k: 56, s: 42 },
                 { l: '9', k: 57, s: 40 }, { l: '0', k: 48, s: 41 }, { l: '-', k: 45, s: 95 },
                 { l: '=', k: 61, s: 43 }, { l: '⌫', k: 65288, w: 2 },
+                { l: 'Ins', k: 65379 }, { l: 'Home', k: 65367 }, { l: 'PgUp', k: 65365 },
             ],
             [
                 { l: 'Tab', k: 65289, w: 1.5 }, { l: 'Q', k: 113 }, { l: 'W', k: 119 },
                 { l: 'E', k: 101 }, { l: 'R', k: 114 }, { l: 'T', k: 116 }, { l: 'Y', k: 121 },
                 { l: 'U', k: 117 }, { l: 'I', k: 105 }, { l: 'O', k: 111 }, { l: 'P', k: 112 },
                 { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '', k: 92, s: 124, w: 1.5 },
+                { l: 'Del', k: 65535 }, { l: 'End', k: 65361 }, { l: 'PgDn', k: 65366 },
             ],
             [
                 { l: 'Caps', k: 65509, w: 1.75, sp: 'caps' }, { l: 'A', k: 97 }, { l: 'S', k: 115 },
@@ -198,19 +234,20 @@ const MODE_LAYOUTS = {
                 { l: 'Shift', k: 65505, w: 2.25, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
                 { l: 'C', k: 99 }, { l: 'V', k: 118 }, { l: 'B', k: 98 }, { l: 'N', k: 110 },
                 { l: 'M', k: 109 }, { l: ',', k: 44, s: 60 }, { l: '.', k: 46, s: 62 },
-                { l: ';', k: 59, s: 58 }, { l: '/', k: 47, s: 63 },
-                { l: 'Shift', k: 65506, w: 1.75, sp: 'shift' },
+                { l: ';', k: 59, s: 58 }, { l: '/', k: 47, s: 63 }, { l: 'Shift', k: 65506, w: 1.75, sp: 'shift' },
             ],
             [
-                { l: 'Ctrl', k: 65507, w: 1.25, sp: 'ctrl' },
-                { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
-                { l: 'Space', k: 32, w: 4.5 },
-                { l: 'AltGr', k: 65027, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.25 },
+                { l: 'Ctrl', k: 65507, w: 1.5, sp: 'ctrl' }, { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
+                { l: 'Space', k: 32, w: 5.5 },
+                { l: 'AltGr', k: 65027, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.5 },
                 { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
             ],
         ],
     },
-    'us-75': {
+};
+
+const SEVENTY_FIVE_LAYOUTS = {
+    us: {
         name: '75% US',
         rows: [
             [
@@ -247,7 +284,7 @@ const MODE_LAYOUTS = {
             ],
         ],
     },
-    'br-75': {
+    br: {
         name: '75% BR',
         rows: [
             [
@@ -284,7 +321,10 @@ const MODE_LAYOUTS = {
             ],
         ],
     },
-    'us-min': {
+};
+
+const MINIMAL_LAYOUTS = {
+    us: {
         name: 'Minimal US',
         rows: [
             [
@@ -308,7 +348,7 @@ const MODE_LAYOUTS = {
             ],
         ],
     },
-    'br-min': {
+    br: {
         name: 'Minimal BR',
         rows: [
             [
@@ -411,16 +451,6 @@ export default class EveKeyboard extends Extension {
         return 'us';
     }
 
-    _resolveModeLayout() {
-        const modeNames = ['full', 'tkl', '75', 'minimal'];
-        const modeName = modeNames[this._layoutMode] || 'full';
-        if (this._layoutMode === 0) {
-            return LAYOUTS[this._currentLayout];
-        }
-        const layoutKey = LAYOUT_MODES[modeName]?.[this._currentLayout];
-        return MODE_LAYOUTS[layoutKey] || LAYOUTS[this._currentLayout];
-    }
-
     _getTargetMonitor() {
         const idx = this._settings.get_int('monitor-index');
         const monitors = Main.layoutManager.monitors;
@@ -442,15 +472,16 @@ export default class EveKeyboard extends Extension {
 
         this._panel.add_child(this._buildHeader());
 
-        const layout = this._resolveModeLayout();
-        for (const row of layout.rows) {
-            const box = new St.BoxLayout({ style_class: 'vkbd-row' });
-            for (const def of row) {
-                const btn = this._mkKey(def);
-                box.add_child(btn);
-                this._keys.push({ btn, def });
-            }
-            this._panel.add_child(box);
+        const mode = this._layoutMode;
+
+        if (mode === 0) {
+            this._buildFullLayout();
+        } else if (mode === 1) {
+            this._buildSimpleLayout(TKL_LAYOUTS[this._currentLayout].rows);
+        } else if (mode === 2) {
+            this._buildSimpleLayout(SEVENTY_FIVE_LAYOUTS[this._currentLayout].rows);
+        } else {
+            this._buildSimpleLayout(MINIMAL_LAYOUTS[this._currentLayout].rows);
         }
 
         Main.layoutManager.addTopChrome(this._panel);
@@ -474,17 +505,108 @@ export default class EveKeyboard extends Extension {
         this._setupDrag();
     }
 
+    _buildFullLayout() {
+        const layout = LAYOUTS[this._currentLayout];
+
+        for (const row of layout.mainRows) {
+            const box = new St.BoxLayout({ style_class: 'vkbd-row' });
+            for (const def of row) {
+                const btn = this._mkKey(def);
+                box.add_child(btn);
+                this._keys.push({ btn, def });
+            }
+
+            if (layout.hasNav) {
+                const rowIdx = layout.mainRows.indexOf(row);
+                if (rowIdx === 0 && layout.navRows[0]) {
+                    for (const def of layout.navRows[0]) {
+                        const btn = this._mkKey(def);
+                        box.add_child(btn);
+                        this._keys.push({ btn, def });
+                    }
+                } else if (rowIdx === 1 && layout.navRows[1]) {
+                    for (const def of layout.navRows[1]) {
+                        const btn = this._mkKey(def);
+                        box.add_child(btn);
+                        this._keys.push({ btn, def });
+                    }
+                }
+            }
+
+            this._panel.add_child(box);
+        }
+
+        if (layout.hasNumpad && layout.numpadRows) {
+            const numpadBox = new St.BoxLayout({
+                style_class: 'vkbd-numpad',
+                vertical: true,
+            });
+            for (const row of layout.numpadRows) {
+                const box = new St.BoxLayout({ style_class: 'vkbd-row' });
+                for (const def of row) {
+                    const btn = this._mkKey(def);
+                    box.add_child(btn);
+                    this._keys.push({ btn, def });
+                }
+                numpadBox.add_child(box);
+            }
+
+            const contentRow = new St.BoxLayout({ style_class: 'vkbd-content' });
+            const mainBox = new St.BoxLayout({ vertical: true });
+
+            let childIdx = 0;
+            let panelChild = null;
+            for (const ch of this._panel.get_children()) {
+                if (childIdx >= 1) {
+                    mainBox.add_child(ch);
+                }
+                childIdx++;
+            }
+
+            while (this._panel.get_children().length > 1) {
+                const ch = this._panel.get_last_child();
+                if (ch !== this._panel.get_first_child()) {
+                    this._panel.remove_child(ch);
+                    mainBox.add_child(ch);
+                } else {
+                    break;
+                }
+            }
+
+            while (this._panel.get_children().length > 1) {
+                const ch = this._panel.get_last_child();
+                this._panel.remove_child(ch);
+                mainBox.insert_child_at_index(ch, 0);
+            }
+
+            contentRow.add_child(mainBox);
+            contentRow.add_child(numpadBox);
+            this._panel.add_child(contentRow);
+        }
+    }
+
+    _buildSimpleLayout(rows) {
+        for (const row of rows) {
+            const box = new St.BoxLayout({ style_class: 'vkbd-row' });
+            for (const def of row) {
+                const btn = this._mkKey(def);
+                box.add_child(btn);
+                this._keys.push({ btn, def });
+            }
+            this._panel.add_child(box);
+        }
+    }
+
     _buildHeader() {
         const bar = new St.BoxLayout({ style_class: 'vkbd-header', reactive: true });
 
-        const titleBtn = new St.Button({
-            label: '⌨  EVE Keyboard',
+        const title = new St.Label({
+            text: '⌨ EVE Keyboard',
             style_class: 'vkbd-title',
-            can_focus: false,
             x_expand: true,
         });
-        titleBtn.tooltip_text = 'EVE Virtual Keyboard';
-        bar.add_child(titleBtn);
+        title.tooltip_text = 'EVE Virtual Keyboard';
+        bar.add_child(title);
 
         const modeLabel = LAYOUT_MODE_LABELS[this._layoutMode] || 'Full';
         this._modeBtn = this._hBtn(modeLabel, `Keyboard mode: ${modeLabel}. Click to cycle Full / TKL / 75% / Minimal`);
@@ -498,9 +620,8 @@ export default class EveKeyboard extends Extension {
         });
         bar.add_child(this._modeBtn);
 
-        this._layoutLabel = this._currentLayout.toUpperCase();
-
-        const layoutBtn = this._hBtn(this._layoutLabel, 'Switch keyboard layout (US / BR)');
+        const layoutLabel = this._currentLayout.toUpperCase();
+        const layoutBtn = this._hBtn(layoutLabel, 'Switch keyboard layout (US / BR)');
         layoutBtn.add_style_class_name('vkbd-layout-btn');
         layoutBtn.connect('clicked', () => {
             this._currentLayout = this._currentLayout === 'us' ? 'br' : 'us';
@@ -567,9 +688,13 @@ export default class EveKeyboard extends Extension {
             can_focus: false,
             style_class: this._keyCls(def, false),
             width: this._size * (def.w ?? 1),
-            height: this._size,
+            height: this._size * (def.h ?? 1),
         });
         btn.add_style_class_name('vkbd-accessible');
+
+        if (def.h && def.h > 1) {
+            btn.height = this._size * def.h;
+        }
 
         btn.connect('button-press-event', () => {
             this._stopRepeat();
@@ -618,11 +743,21 @@ export default class EveKeyboard extends Extension {
     }
 
     _rebuildKbd() {
+        const wasVisible = this._panel?.visible ?? false;
+        const posX = this._panel?.x;
+        const posY = this._panel?.y;
+
         if (this._panel) {
             Main.layoutManager.removeChrome(this._panel);
             this._panel.destroy();
         }
         this._buildKbd();
+
+        if (posX !== undefined && posY !== undefined) {
+            this._panel.set_position(posX, posY);
+        }
+
+        this._panel.visible = wasVisible;
     }
 
     _startDrag() {
@@ -868,7 +1003,7 @@ export default class EveKeyboard extends Extension {
 
     _applySize() {
         for (const { btn, def } of this._keys)
-            btn.set_size(this._size * (def.w ?? 1), this._size);
+            btn.set_size(this._size * (def.w ?? 1), this._size * (def.h ?? 1));
 
         const mon = this._getTargetMonitor();
         this._panel.set_position(
