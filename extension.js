@@ -636,74 +636,98 @@ _calcBlockHeight(rows, U, GAP) {
     return container;
   }
 
-  _buildNavArrowBlock(navRows, arrowRows, U, GAP) {
-    const container = new St.Widget({ style_class: 'vkbd-block' });
+    _buildNavArrowBlock(navRows, arrowRows, U, GAP, totalHeight) {
+        const vBox = new St.BoxLayout({
+            style_class: 'vkbd-block',
+            vertical: true,
+        });
+        vBox.set_style(`-st-spacing: ${GAP}px;`);
 
-    const navH = this._calcBlockHeight(navRows, U, GAP);
-    let maxW = 0;
-    for (const row of navRows) {
-      const rw = this._rowWidthPx(row, U, GAP);
-      if (rw > maxW) maxW = rw;
+        let maxW = 0;
+
+        const navWidget = new St.Widget({ style_class: 'vkbd-nav' });
+        const navH = this._calcBlockHeight(navRows, U, GAP);
+        for (const row of navRows) {
+            const rw = this._rowWidthPx(row, U, GAP);
+            if (rw > maxW) maxW = rw;
+        }
+        const rowYNav = [];
+        let yOff = 0;
+        for (let ri = 0; ri < navRows.length; ri++) {
+            rowYNav.push(yOff);
+            yOff += this._calcRowHeight(navRows[ri], U, GAP) + GAP;
+        }
+        for (let ri = 0; ri < navRows.length; ri++) {
+            const row = navRows[ri];
+            let x = 0;
+            for (const def of row) {
+                const btn = this._mkKey(def, U, GAP);
+                btn.set_position(x, rowYNav[ri]);
+                navWidget.add_child(btn);
+                this._keys.push({ btn, def });
+                x += keyPx(def.w ?? 1, U, GAP) + GAP;
+            }
+        }
+        navWidget.set_size(maxW, navH);
+        vBox.add_child(navWidget);
+
+        const arrowH = this._calcBlockHeight(arrowRows, U, GAP);
+        for (const row of arrowRows) {
+            const rw = this._rowWidthPx(row, U, GAP);
+            if (rw > maxW) maxW = rw;
+        }
+        const spacerHeight = totalHeight - navH - arrowH - GAP * 2;
+        const spacer = new St.Widget({ style_class: 'vkbd-nav-spacer' });
+        spacer.set_size(maxW, Math.max(0, spacerHeight));
+        spacer.y_expand = true;
+        vBox.add_child(spacer);
+
+        const arrowWidget = new St.Widget({ style_class: 'vkbd-arrows' });
+        const rowYArrow = [];
+        let ayOff = 0;
+        for (let ri = 0; ri < arrowRows.length; ri++) {
+            rowYArrow.push(ayOff);
+            ayOff += this._calcRowHeight(arrowRows[ri], U, GAP) + GAP;
+        }
+        for (let ri = 0; ri < arrowRows.length; ri++) {
+            const row = arrowRows[ri];
+            let x = 0;
+            for (const def of row) {
+                if (def.k === 0 && !def.l) { x += keyPx(def.w ?? 1, U, GAP) + GAP; continue; }
+                const btn = this._mkKey(def, U, GAP);
+                btn.set_position(x, rowYArrow[ri]);
+                arrowWidget.add_child(btn);
+                this._keys.push({ btn, def });
+                x += keyPx(def.w ?? 1, U, GAP) + GAP;
+            }
+        }
+        arrowWidget.set_size(maxW, arrowH);
+        vBox.add_child(arrowWidget);
+
+        vBox.set_size(maxW, totalHeight);
+
+        return vBox;
     }
 
-    const rowYNav = [];
-    let yOff = 0;
-    for (let ri = 0; ri < navRows.length; ri++) {
-      rowYNav.push(yOff);
-      yOff += this._calcRowHeight(navRows[ri], U, GAP) + GAP;
+    _tklArrowRows(arrowDefs) {
+        const up = arrowDefs.find(d => d.k === 65362);
+        const left = arrowDefs.find(d => d.k === 65361);
+        const down = arrowDefs.find(d => d.k === 65364);
+        const right = arrowDefs.find(d => d.k === 65363);
+        return [
+            [{ l: '', k: 0 }, up ?? { l: '↑', k: 65362 }],
+            [left ?? { l: '←', k: 65361 }, down ?? { l: '↓', k: 65364 }, right ?? { l: '→', k: 65363 }],
+        ];
     }
 
-    for (let ri = 0; ri < navRows.length; ri++) {
-      const row = navRows[ri];
-      let x = 0;
-      for (const def of row) {
-        const btn = this._mkKey(def, U, GAP);
-        btn.set_position(x, rowYNav[ri]);
-        container.add_child(btn);
-        this._keys.push({ btn, def });
-        x += keyPx(def.w ?? 1, U, GAP) + GAP;
-      }
-    }
-
-    const arrowStartY = navH + GAP;
-    const rowYArrow = [];
-    let ayOff = arrowStartY;
-    for (let ri = 0; ri < arrowRows.length; ri++) {
-      rowYArrow.push(ayOff);
-      ayOff += this._calcRowHeight(arrowRows[ri], U, GAP) + GAP;
-    }
-
-    for (let ri = 0; ri < arrowRows.length; ri++) {
-      const row = arrowRows[ri];
-      let x = 0;
-      for (const def of row) {
-        if (def.k === 0 && !def.l) { x += keyPx(def.w ?? 1, U, GAP) + GAP; continue; }
-        const btn = this._mkKey(def, U, GAP);
-        btn.set_position(x, rowYArrow[ri]);
-        container.add_child(btn);
-        this._keys.push({ btn, def });
-        x += keyPx(def.w ?? 1, U, GAP) + GAP;
-      }
-    }
-
-    for (const row of arrowRows) {
-      const rw = this._rowWidthPx(row, U, GAP);
-      if (rw > maxW) maxW = rw;
-    }
-
-    const totalH = ayOff - GAP;
-    container.set_size(maxW, totalH);
-
-    return container;
-  }
-
-  _buildFullLayout() {
+    _buildFullLayout() {
     const layout = LAYOUTS[this._currentLayout];
     const { u: U, gap: GAP } = this._unitCfg;
 
     const mainBlock = this._buildMainBlockStagger(layout.mainRows, U, GAP);
 
-    const navArrowBlock = this._buildNavArrowBlock(layout.navRows, layout.arrowRows, U, GAP);
+        const mainBlockHeight = this._calcBlockHeight(layout.mainRows, U, GAP);
+        const navArrowBlock = this._buildNavArrowBlock(layout.navRows, layout.arrowRows, U, GAP, mainBlockHeight);
 
     const numpadBlock = this._buildNumpadBlock(layout.numpadGrid, layout.numpadSide, U, GAP);
 
@@ -734,26 +758,35 @@ _buildSimpleLayout(rows) {
     } else {
         const isTKL = this._layoutMode === 1;
 
-        if (isTKL) {
-            const mainRows = rows.slice(0, 5);
-            const navKeysRow0 = rows[0].slice(14);
-            const navKeysRow1 = rows[1].slice(14);
-            const cleanMainRows = [
-                rows[0].slice(0, 14),
-                rows[1].slice(0, 14),
-                ...rows.slice(2),
-            ];
+            if (isTKL) {
+                const mainRows = rows.slice(0, 5);
+                const navKeysRow0 = rows[0].slice(14);
+                const navKeysRow1 = rows[1].slice(14);
+                const lastRow = rows[4];
+                const arrowStartIdx = lastRow.findIndex(d =>
+                    d.k === 65361 || d.k === 65362 || d.k === 65363 || d.k === 65364);
+                const cleanLastRow = arrowStartIdx >= 0 ? lastRow.slice(0, arrowStartIdx) : lastRow;
+                const arrowDefs = arrowStartIdx >= 0 ? lastRow.slice(arrowStartIdx) : [];
+                const cleanMainRows = [
+                    rows[0].slice(0, 14),
+                    rows[1].slice(0, 14),
+                    ...rows.slice(2, 4),
+                    cleanLastRow,
+                ];
 
-            const mainBlock = this._buildMainBlockStagger(cleanMainRows, U, GAP);
+                const mainBlock = this._buildMainBlockStagger(cleanMainRows, U, GAP);
+                const mainBlockHeight = this._calcBlockHeight(cleanMainRows, U, GAP);
 
-            const navRows = [navKeysRow0, navKeysRow1];
-            const navBlock = this._buildAbsoluteBlock(navRows, U, GAP, null);
+                const navRows = [navKeysRow0, navKeysRow1];
+                const arrowRows = this._tklArrowRows(arrowDefs);
 
-            const contentRow = new St.BoxLayout({ style_class: 'vkbd-content' });
-        contentRow.set_style(`-st-spacing: ${GAP * 2}px;`);
-            contentRow.add_child(mainBlock);
-            contentRow.add_child(navBlock);
-            this._panel.add_child(contentRow);
+                const navArrowBlock = this._buildNavArrowBlock(navRows, arrowRows, U, GAP, mainBlockHeight);
+
+                const contentRow = new St.BoxLayout({ style_class: 'vkbd-content' });
+                contentRow.set_style(`-st-spacing: ${GAP * 2}px;`);
+                contentRow.add_child(mainBlock);
+                contentRow.add_child(navArrowBlock);
+                this._panel.add_child(contentRow);
         } else {
             const mainBlock = this._buildMainBlockStagger(rows, U, GAP);
             this._panel.add_child(mainBlock);
