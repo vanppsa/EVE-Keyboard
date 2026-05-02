@@ -35,10 +35,10 @@ const LAYOUTS = {
                 { l: ';', k: 59, s: 58 }, { l: "'", k: 39, s: 34 }, { l: 'Enter', k: 65293, w: 2.25 },
             ],
             [
-                { l: '⇧', k: 65505, w: 2.25, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
+                { l: 'Shift', k: 65505, w: 2.25, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
                 { l: 'C', k: 99 }, { l: 'V', k: 118 }, { l: 'B', k: 98 }, { l: 'N', k: 110 },
                 { l: 'M', k: 109 }, { l: ',', k: 44, s: 60 }, { l: '.', k: 46, s: 62 },
-                { l: '/', k: 47, s: 63 }, { l: '⇧', k: 65506, w: 2.75, sp: 'shift' },
+                { l: '/', k: 47, s: 63 }, { l: 'Shift', k: 65506, w: 2.75, sp: 'shift' },
             ],
             [
                 { l: 'Ctrl', k: 65507, w: 1.5, sp: 'ctrl' }, { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
@@ -71,10 +71,10 @@ const LAYOUTS = {
                 { l: 'Ç', k: 231 }, { l: '~', k: 65104, dd: true }, { l: 'Enter', k: 65293, w: 2.25 },
             ],
             [
-                { l: '⇧', k: 65505, w: 2.25, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
+                { l: 'Shift', k: 65505, w: 2.25, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
                 { l: 'C', k: 99 }, { l: 'V', k: 118 }, { l: 'B', k: 98 }, { l: 'N', k: 110 },
                 { l: 'M', k: 109 }, { l: ',', k: 44, s: 60 }, { l: '.', k: 46, s: 62 },
-                { l: ';', k: 59, s: 58 }, { l: '/', k: 47, s: 63 }, { l: '⇧', k: 65506, w: 1.75, sp: 'shift' },
+                { l: ';', k: 59, s: 58 }, { l: '/', k: 47, s: 63 }, { l: 'Shift', k: 65506, w: 1.75, sp: 'shift' },
             ],
             [
                 { l: 'Ctrl', k: 65507, w: 1.5, sp: 'ctrl' }, { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
@@ -109,6 +109,231 @@ const DEAD_KEY_MAP = {
     },
 };
 
+const OPACITY_LEVELS = [1.0, 0.75, 0.50, 0.25];
+
+const LAYOUT_MODE_LABELS = ['Full', 'TKL', '75%', 'Minimal'];
+
+const LAYOUT_MODES = {
+    full: {
+        us: 'us',
+        br: 'br',
+    },
+    tkl: {
+        us: 'us-tkl',
+        br: 'br-tkl',
+    },
+    '75': {
+        us: 'us-75',
+        br: 'br-75',
+    },
+    minimal: {
+        us: 'us-min',
+        br: 'br-min',
+    },
+};
+
+const MODE_LAYOUTS = {
+    'us-tkl': {
+        name: 'TKL US',
+        rows: [
+            [
+                { l: '`', k: 96, s: 126 }, { l: '1', k: 49, s: 33 }, { l: '2', k: 50, s: 64 },
+                { l: '3', k: 51, s: 35 }, { l: '4', k: 52, s: 36 }, { l: '5', k: 53, s: 37 },
+                { l: '6', k: 54, s: 94 }, { l: '7', k: 55, s: 38 }, { l: '8', k: 56, s: 42 },
+                { l: '9', k: 57, s: 40 }, { l: '0', k: 48, s: 41 }, { l: '-', k: 45, s: 95 },
+                { l: '=', k: 61, s: 43 }, { l: '⌫', k: 65288, w: 2 },
+            ],
+            [
+                { l: 'Tab', k: 65289, w: 1.5 }, { l: 'Q', k: 113 }, { l: 'W', k: 119 },
+                { l: 'E', k: 101 }, { l: 'R', k: 114 }, { l: 'T', k: 116 }, { l: 'Y', k: 121 },
+                { l: 'U', k: 117 }, { l: 'I', k: 105 }, { l: 'O', k: 111 }, { l: 'P', k: 112 },
+                { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '', k: 92, s: 124, w: 1.5 },
+            ],
+            [
+                { l: 'Caps', k: 65509, w: 1.75, sp: 'caps' }, { l: 'A', k: 97 }, { l: 'S', k: 115 },
+                { l: 'D', k: 100 }, { l: 'F', k: 102 }, { l: 'G', k: 103 }, { l: 'H', k: 104 },
+                { l: 'J', k: 106 }, { l: 'K', k: 107 }, { l: 'L', k: 108 },
+                { l: ';', k: 59, s: 58 }, { l: "'", k: 39, s: 34 }, { l: 'Enter', k: 65293, w: 2.25 },
+            ],
+            [
+                { l: 'Shift', k: 65505, w: 2.25, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
+                { l: 'C', k: 99 }, { l: 'V', k: 118 }, { l: 'B', k: 98 }, { l: 'N', k: 110 },
+                { l: 'M', k: 109 }, { l: ',', k: 44, s: 60 }, { l: '.', k: 46, s: 62 },
+                { l: '/', k: 47, s: 63 },
+                { l: 'Shift', k: 65506, w: 1.75, sp: 'shift' },
+                { l: '↑', k: 65362 }, { l: '↓', k: 65364 },
+            ],
+            [
+                { l: 'Ctrl', k: 65507, w: 1.25, sp: 'ctrl' },
+                { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
+                { l: 'Space', k: 32, w: 4.5 },
+                { l: 'Alt', k: 65514, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.25 },
+                { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
+            ],
+        ],
+    },
+    'br-tkl': {
+        name: 'TKL BR',
+        rows: [
+            [
+                { l: '`', k: 96, s: 126 }, { l: '1', k: 49, s: 33 }, { l: '2', k: 50, s: 64 },
+                { l: '3', k: 51, s: 35 }, { l: '4', k: 52, s: 36 }, { l: '5', k: 53, s: 37 },
+                { l: '6', k: 54, s: 94 }, { l: '7', k: 55, s: 38 }, { l: '8', k: 56, s: 42 },
+                { l: '9', k: 57, s: 40 }, { l: '0', k: 48, s: 41 }, { l: '-', k: 45, s: 95 },
+                { l: '=', k: 61, s: 43 }, { l: '⌫', k: 65288, w: 2 },
+            ],
+            [
+                { l: 'Tab', k: 65289, w: 1.5 }, { l: 'Q', k: 113 }, { l: 'W', k: 119 },
+                { l: 'E', k: 101 }, { l: 'R', k: 114 }, { l: 'T', k: 116 }, { l: 'Y', k: 121 },
+                { l: 'U', k: 117 }, { l: 'I', k: 105 }, { l: 'O', k: 111 }, { l: 'P', k: 112 },
+                { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '', k: 92, s: 124, w: 1.5 },
+            ],
+            [
+                { l: 'Caps', k: 65509, w: 1.75, sp: 'caps' }, { l: 'A', k: 97 }, { l: 'S', k: 115 },
+                { l: 'D', k: 100 }, { l: 'F', k: 102 }, { l: 'G', k: 103 }, { l: 'H', k: 104 },
+                { l: 'J', k: 106 }, { l: 'K', k: 107 }, { l: 'L', k: 108 },
+                { l: 'Ç', k: 231 }, { l: '~', k: 65104, dd: true }, { l: 'Enter', k: 65293, w: 2.25 },
+            ],
+            [
+                { l: 'Shift', k: 65505, w: 2.25, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
+                { l: 'C', k: 99 }, { l: 'V', k: 118 }, { l: 'B', k: 98 }, { l: 'N', k: 110 },
+                { l: 'M', k: 109 }, { l: ',', k: 44, s: 60 }, { l: '.', k: 46, s: 62 },
+                { l: ';', k: 59, s: 58 }, { l: '/', k: 47, s: 63 },
+                { l: 'Shift', k: 65506, w: 1.75, sp: 'shift' },
+            ],
+            [
+                { l: 'Ctrl', k: 65507, w: 1.25, sp: 'ctrl' },
+                { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
+                { l: 'Space', k: 32, w: 4.5 },
+                { l: 'AltGr', k: 65027, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.25 },
+                { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
+            ],
+        ],
+    },
+    'us-75': {
+        name: '75% US',
+        rows: [
+            [
+                { l: '`', k: 96, s: 126 }, { l: '1', k: 49, s: 33 }, { l: '2', k: 50, s: 64 },
+                { l: '3', k: 51, s: 35 }, { l: '4', k: 52, s: 36 }, { l: '5', k: 53, s: 37 },
+                { l: '6', k: 54, s: 94 }, { l: '7', k: 55, s: 38 }, { l: '8', k: 56, s: 42 },
+                { l: '9', k: 57, s: 40 }, { l: '0', k: 48, s: 41 }, { l: '-', k: 45, s: 95 },
+                { l: '=', k: 61, s: 43 }, { l: '⌫', k: 65288, w: 2 },
+            ],
+            [
+                { l: 'Tab', k: 65289, w: 1.5 }, { l: 'Q', k: 113 }, { l: 'W', k: 119 },
+                { l: 'E', k: 101 }, { l: 'R', k: 114 }, { l: 'T', k: 116 }, { l: 'Y', k: 121 },
+                { l: 'U', k: 117 }, { l: 'I', k: 105 }, { l: 'O', k: 111 }, { l: 'P', k: 112 },
+                { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '', k: 92, s: 124, w: 1.5 },
+            ],
+            [
+                { l: 'Caps', k: 65509, w: 1.75, sp: 'caps' }, { l: 'A', k: 97 }, { l: 'S', k: 115 },
+                { l: 'D', k: 100 }, { l: 'F', k: 102 }, { l: 'G', k: 103 }, { l: 'H', k: 104 },
+                { l: 'J', k: 106 }, { l: 'K', k: 107 }, { l: 'L', k: 108 },
+                { l: ';', k: 59, s: 58 }, { l: "'", k: 39, s: 34 }, { l: 'Enter', k: 65293, w: 2.25 },
+            ],
+            [
+                { l: 'Shift', k: 65505, w: 1.75, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
+                { l: 'C', k: 99 }, { l: 'V', k: 118 }, { l: 'B', k: 98 }, { l: 'N', k: 110 },
+                { l: 'M', k: 109 }, { l: ',', k: 44, s: 60 }, { l: '.', k: 46, s: 62 },
+                { l: '/', k: 47, s: 63 }, { l: 'Shift', k: 65506, w: 1.75, sp: 'shift' },
+            ],
+            [
+                { l: 'Ctrl', k: 65507, w: 1.25, sp: 'ctrl' },
+                { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
+                { l: 'Space', k: 32, w: 4 },
+                { l: 'Alt', k: 65514, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.25 },
+                { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
+            ],
+        ],
+    },
+    'br-75': {
+        name: '75% BR',
+        rows: [
+            [
+                { l: '`', k: 96, s: 126 }, { l: '1', k: 49, s: 33 }, { l: '2', k: 50, s: 64 },
+                { l: '3', k: 51, s: 35 }, { l: '4', k: 52, s: 36 }, { l: '5', k: 53, s: 37 },
+                { l: '6', k: 54, s: 94 }, { l: '7', k: 55, s: 38 }, { l: '8', k: 56, s: 42 },
+                { l: '9', k: 57, s: 40 }, { l: '0', k: 48, s: 41 }, { l: '-', k: 45, s: 95 },
+                { l: '=', k: 61, s: 43 }, { l: '⌫', k: 65288, w: 2 },
+            ],
+            [
+                { l: 'Tab', k: 65289, w: 1.5 }, { l: 'Q', k: 113 }, { l: 'W', k: 119 },
+                { l: 'E', k: 101 }, { l: 'R', k: 114 }, { l: 'T', k: 116 }, { l: 'Y', k: 121 },
+                { l: 'U', k: 117 }, { l: 'I', k: 105 }, { l: 'O', k: 111 }, { l: 'P', k: 112 },
+                { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '', k: 92, s: 124, w: 1.5 },
+            ],
+            [
+                { l: 'Caps', k: 65509, w: 1.75, sp: 'caps' }, { l: 'A', k: 97 }, { l: 'S', k: 115 },
+                { l: 'D', k: 100 }, { l: 'F', k: 102 }, { l: 'G', k: 103 }, { l: 'H', k: 104 },
+                { l: 'J', k: 106 }, { l: 'K', k: 107 }, { l: 'L', k: 108 },
+                { l: 'Ç', k: 231 }, { l: '~', k: 65104, dd: true }, { l: 'Enter', k: 65293, w: 2.25 },
+            ],
+            [
+                { l: 'Shift', k: 65505, w: 1.75, sp: 'shift' }, { l: 'Z', k: 122 }, { l: 'X', k: 120 },
+                { l: 'C', k: 99 }, { l: 'V', k: 118 }, { l: 'B', k: 98 }, { l: 'N', k: 110 },
+                { l: 'M', k: 109 }, { l: ',', k: 44, s: 60 }, { l: '.', k: 46, s: 62 },
+                { l: ';', k: 59, s: 58 }, { l: '/', k: 47, s: 63 }, { l: 'Shift', k: 65506, w: 1.75, sp: 'shift' },
+            ],
+            [
+                { l: 'Ctrl', k: 65507, w: 1.25, sp: 'ctrl' },
+                { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
+                { l: 'Space', k: 32, w: 4 },
+                { l: 'AltGr', k: 65027, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.25 },
+                { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
+            ],
+        ],
+    },
+    'us-min': {
+        name: 'Minimal US',
+        rows: [
+            [
+                { l: 'Q', k: 113 }, { l: 'W', k: 119 }, { l: 'E', k: 101 }, { l: 'R', k: 114 },
+                { l: 'T', k: 116 }, { l: 'Y', k: 121 }, { l: 'U', k: 117 }, { l: 'I', k: 105 },
+                { l: 'O', k: 111 }, { l: 'P', k: 112 },
+            ],
+            [
+                { l: 'A', k: 97 }, { l: 'S', k: 115 }, { l: 'D', k: 100 }, { l: 'F', k: 102 },
+                { l: 'G', k: 103 }, { l: 'H', k: 104 }, { l: 'J', k: 106 }, { l: 'K', k: 107 },
+                { l: 'L', k: 108 },
+            ],
+            [
+                { l: 'Shift', k: 65505, w: 1.5, sp: 'shift' },
+                { l: 'Z', k: 122 }, { l: 'X', k: 120 }, { l: 'C', k: 99 }, { l: 'V', k: 118 },
+                { l: 'B', k: 98 }, { l: 'N', k: 110 }, { l: 'M', k: 109 },
+                { l: '⌫', k: 65288, w: 1.5 },
+            ],
+            [
+                { l: 'Space', k: 32, w: 5 },
+            ],
+        ],
+    },
+    'br-min': {
+        name: 'Minimal BR',
+        rows: [
+            [
+                { l: 'Q', k: 113 }, { l: 'W', k: 119 }, { l: 'E', k: 101 }, { l: 'R', k: 114 },
+                { l: 'T', k: 116 }, { l: 'Y', k: 121 }, { l: 'U', k: 117 }, { l: 'I', k: 105 },
+                { l: 'O', k: 111 }, { l: 'P', k: 112 },
+            ],
+            [
+                { l: 'A', k: 97 }, { l: 'S', k: 115 }, { l: 'D', k: 100 }, { l: 'F', k: 102 },
+                { l: 'G', k: 103 }, { l: 'H', k: 104 }, { l: 'J', k: 106 }, { l: 'K', k: 107 },
+                { l: 'L', k: 108 }, { l: 'Ç', k: 231 },
+            ],
+            [
+                { l: 'Shift', k: 65505, w: 1.5, sp: 'shift' },
+                { l: 'Z', k: 122 }, { l: 'X', k: 120 }, { l: 'C', k: 99 }, { l: 'V', k: 118 },
+                { l: 'B', k: 98 }, { l: 'N', k: 110 }, { l: 'M', k: 109 },
+                { l: '⌫', k: 65288, w: 1.5 },
+            ],
+            [
+                { l: 'Space', k: 32, w: 5 },
+            ],
+        ],
+    },
+};
+
 export default class EveKeyboard extends Extension {
 
     enable() {
@@ -127,7 +352,7 @@ export default class EveKeyboard extends Extension {
 
         const sizeStr = this._settings.get_string('key-size');
         this._size = SIZES[sizeStr] || SIZES.M;
-        
+
         this._scale = this._settings.get_double('panel-scale');
 
         this._shift = false;
@@ -135,7 +360,13 @@ export default class EveKeyboard extends Extension {
         this._ctrl = false;
         this._alt = false;
 
+        this._layoutMode = this._settings.get_int('layout-mode');
+        if (this._layoutMode < 0 || this._layoutMode > 3) this._layoutMode = 0;
+
         this._currentLayout = this._resolveLayout();
+
+        this._opacityIdx = OPACITY_LEVELS.indexOf(this._settings.get_double('opacity'));
+        if (this._opacityIdx < 0) this._opacityIdx = 0;
 
         const backend = global.stage.context.get_backend();
         const seat = backend.get_default_seat();
@@ -180,6 +411,16 @@ export default class EveKeyboard extends Extension {
         return 'us';
     }
 
+    _resolveModeLayout() {
+        const modeNames = ['full', 'tkl', '75', 'minimal'];
+        const modeName = modeNames[this._layoutMode] || 'full';
+        if (this._layoutMode === 0) {
+            return LAYOUTS[this._currentLayout];
+        }
+        const layoutKey = LAYOUT_MODES[modeName]?.[this._currentLayout];
+        return MODE_LAYOUTS[layoutKey] || LAYOUTS[this._currentLayout];
+    }
+
     _getTargetMonitor() {
         const idx = this._settings.get_int('monitor-index');
         const monitors = Main.layoutManager.monitors;
@@ -195,9 +436,13 @@ export default class EveKeyboard extends Extension {
             reactive: true,
             style_class: `vkbd ${themeCls}`,
         });
+
+        const opacityVal = OPACITY_LEVELS[this._opacityIdx];
+        this._panel.opacity = Math.round(opacityVal * 255);
+
         this._panel.add_child(this._buildHeader());
 
-        const layout = LAYOUTS[this._currentLayout];
+        const layout = this._resolveModeLayout();
         for (const row of layout.rows) {
             const box = new St.BoxLayout({ style_class: 'vkbd-row' });
             for (const def of row) {
@@ -228,22 +473,40 @@ export default class EveKeyboard extends Extension {
         this._applyScale();
         this._setupDrag();
     }
+
     _buildHeader() {
         const bar = new St.BoxLayout({ style_class: 'vkbd-header', reactive: true });
 
-        const title = new St.Label({
-            text: '⌨  EVE Keyboard',
+        const titleBtn = new St.Button({
+            label: '⌨  EVE Keyboard',
             style_class: 'vkbd-title',
+            can_focus: false,
             x_expand: true,
         });
-        title.add_style_class_name('vkbd-accessible');
-        bar.add_child(title);
+        titleBtn.tooltip_text = 'EVE Virtual Keyboard';
+        bar.add_child(titleBtn);
 
-        const layoutBtn = this._hBtn(this._currentLayout.toUpperCase(), 'Change layout');
+        const modeLabel = LAYOUT_MODE_LABELS[this._layoutMode] || 'Full';
+        this._modeBtn = this._hBtn(modeLabel, `Keyboard mode: ${modeLabel}. Click to cycle Full / TKL / 75% / Minimal`);
+        this._modeBtn.add_style_class_name('vkbd-mode-btn');
+        this._modeBtn.connect('clicked', () => {
+            this._layoutMode = (this._layoutMode + 1) % 4;
+            this._settings.set_int('layout-mode', this._layoutMode);
+            this._modeBtn.label = LAYOUT_MODE_LABELS[this._layoutMode];
+            this._modeBtn.tooltip_text = `Keyboard mode: ${LAYOUT_MODE_LABELS[this._layoutMode]}. Click to cycle Full / TKL / 75% / Minimal`;
+            this._rebuildKbd();
+        });
+        bar.add_child(this._modeBtn);
+
+        this._layoutLabel = this._currentLayout.toUpperCase();
+
+        const layoutBtn = this._hBtn(this._layoutLabel, 'Switch keyboard layout (US / BR)');
         layoutBtn.add_style_class_name('vkbd-layout-btn');
         layoutBtn.connect('clicked', () => {
             this._currentLayout = this._currentLayout === 'us' ? 'br' : 'us';
             layoutBtn.label = this._currentLayout.toUpperCase();
+            layoutBtn.tooltip_text = `Switch keyboard layout (${this._currentLayout === 'us' ? 'QWERTY US' : 'ABNT2 BR'})`;
+            this._settings.set_string('layout', this._currentLayout);
             this._rebuildKbd();
         });
         bar.add_child(layoutBtn);
@@ -259,15 +522,27 @@ export default class EveKeyboard extends Extension {
             bar.add_child(b);
         }
 
-        this._themeBtn = this._hBtn(this._dark ? '☀' : '🌙', 'Toggle light/dark theme');
+        const curOpPct = Math.round(OPACITY_LEVELS[this._opacityIdx] * 100);
+        this._opacityBtn = this._hBtn('◐', `Opacity: ${curOpPct}%. Click to cycle 100% / 75% / 50% / 25%`);
+        this._opacityBtn.connect('clicked', () => {
+            this._opacityIdx = (this._opacityIdx + 1) % OPACITY_LEVELS.length;
+            const val = OPACITY_LEVELS[this._opacityIdx];
+            this._panel.opacity = Math.round(val * 255);
+            this._settings.set_double('opacity', val);
+            const pct = Math.round(val * 100);
+            this._opacityBtn.tooltip_text = `Opacity: ${pct}%. Click to cycle 100% / 75% / 50% / 25%`;
+        });
+        bar.add_child(this._opacityBtn);
+
+        this._themeBtn = this._hBtn(this._dark ? '☀' : '🌙', 'Toggle light / dark theme');
         this._themeBtn.connect('clicked', () => this._toggleTheme());
         bar.add_child(this._themeBtn);
 
-        this._dragBtn = this._hBtn('✥', 'Move keyboard');
+        this._dragBtn = this._hBtn('✥', 'Drag to reposition keyboard');
         this._dragBtn.connect('button-press-event', () => this._startDrag());
         bar.add_child(this._dragBtn);
 
-        this._resizeBtn = this._hBtn('⤡', 'Resize');
+        this._resizeBtn = this._hBtn('⤡', 'Resize keyboard');
         this._resizeBtn.connect('button-press-event', () => this._startResize());
         bar.add_child(this._resizeBtn);
 
@@ -307,7 +582,7 @@ export default class EveKeyboard extends Extension {
                     REPEAT_DELAY_MS,
                     () => {
                         if (this._repeatId !== sid) return GLib.SOURCE_REMOVE;
-                        
+
                         this._repeatTimer = GLib.timeout_add(
                             GLib.PRIORITY_DEFAULT,
                             REPEAT_INTERVAL_MS,
@@ -362,14 +637,14 @@ export default class EveKeyboard extends Extension {
             const t = e.type();
             if (t === Clutter.EventType.MOTION) {
                 const [x, y] = e.get_coords();
-                
+
                 if (this._dragState) {
                     const d = this._dragState;
                     this._panel.set_position(d.ox + x - d.sx, d.oy + y - d.sy);
                 } else if (this._resizeState) {
                     const d = this._resizeState;
                     const dx = x - d.sx;
-                    
+
                     this._scale = Math.max(0.5, Math.min(2.0, d.baseScale + (dx / 300)));
                     this._applyScale();
                     this._settings.set_double('panel-scale', this._scale);
@@ -387,6 +662,25 @@ export default class EveKeyboard extends Extension {
             }
             return Clutter.EVENT_PROPAGATE;
         }));
+    }
+
+    _clampToMonitor() {
+        if (!this._panel) return;
+        const mon = this._getTargetMonitor();
+        let x = this._panel.x;
+        let y = this._panel.y;
+        const w = this._panel.width;
+        const h = this._panel.height;
+
+        if (x < mon.x) x = mon.x;
+        if (y < mon.y) y = mon.y;
+        if (x + w > mon.x + mon.width) x = mon.x + mon.width - w;
+        if (y + h > mon.y + mon.height) y = mon.y + mon.height - h;
+
+        if (x !== this._panel.x || y !== this._panel.y) {
+            this._panel.set_position(x, y);
+            this._savePosition();
+        }
     }
 
     _savePosition() {
@@ -410,6 +704,21 @@ export default class EveKeyboard extends Extension {
             }
         });
 
+        this._settings.connect('changed::layout-mode', () => {
+            const newMode = this._settings.get_int('layout-mode');
+            if (newMode !== this._layoutMode) {
+                this._layoutMode = newMode;
+                this._rebuildKbd();
+            }
+        });
+
+        this._settings.connect('changed::opacity', () => {
+            const val = this._settings.get_double('opacity');
+            const idx = OPACITY_LEVELS.indexOf(val);
+            if (idx >= 0) this._opacityIdx = idx;
+            if (this._panel) this._panel.opacity = Math.round(val * 255);
+        });
+
         this._settings.connect('changed::monitor-index', () => {
             const mon = this._getTargetMonitor();
             this._panel.set_position(
@@ -430,7 +739,10 @@ export default class EveKeyboard extends Extension {
             this._focusSids.push(im.connect('notify::has-focus', () => {
                 if (!this._settings.get_boolean('auto-show')) return;
                 if (im.has_focus) {
-                    if (this._panel && !this._panel.visible) this._panel.visible = true;
+                    if (this._panel && !this._panel.visible) {
+                        this._clampToMonitor();
+                        this._panel.visible = true;
+                    }
                 }
             }));
 
@@ -469,10 +781,10 @@ export default class EveKeyboard extends Extension {
         if (this._alt) this._vkbd.notify_keyval(t++, 65513, Clutter.KeyState.PRESSED);
 
         let kv = def.k;
-        const isLetter = (kv >= 97 && kv <= 122) || kv === 231; 
+        const isLetter = (kv >= 97 && kv <= 122) || kv === 231;
         if (isLetter) {
             if (this._shift !== this._caps) {
-                if (kv === 231) kv = 199; 
+                if (kv === 231) kv = 199;
                 else kv -= 32;
             }
         } else if (this._shift && def.s != null) {
@@ -549,6 +861,7 @@ export default class EveKeyboard extends Extension {
         const t = this._dark ? 'dk' : 'lt';
         this._panel.style_class = `vkbd vkbd-${t}`;
         this._themeBtn.label = this._dark ? '☀' : '🌙';
+        this._themeBtn.tooltip_text = this._dark ? 'Switch to light theme' : 'Switch to dark theme';
         this._settings.set_string('theme', this._dark ? 'dark' : 'light');
         this._refresh();
     }
@@ -568,9 +881,9 @@ export default class EveKeyboard extends Extension {
     _startResize() {
         const [sx, sy] = global.get_pointer();
         this._panel.add_style_class_name('vkbd-resize-active');
-        this._resizeState = { 
-            sx, 
-            sy, 
+        this._resizeState = {
+            sx,
+            sy,
             baseScale: this._scale,
         };
     }
@@ -588,9 +901,13 @@ export default class EveKeyboard extends Extension {
 
         this._indicator.connect('button-press-event', () => {
             if (this._panel) {
-                this._panel.visible = !this._panel.visible;
-                if (this._panel.visible)
+                if (!this._panel.visible) {
+                    this._clampToMonitor();
+                    this._panel.visible = true;
                     this._panel.raise_top();
+                } else {
+                    this._panel.visible = false;
+                }
             }
             return Clutter.EVENT_STOP;
         });

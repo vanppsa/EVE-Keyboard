@@ -36,6 +36,19 @@ export default class EveKeyboardPrefs extends ExtensionPreferences {
         });
         appearanceGroup.add(sizeRow);
 
+        const opacityRow = new Adw.ComboRow({
+            title: 'Opacity',
+            model: new Gtk.StringList({ strings: ['100%', '75%', '50%', '25%'] }),
+        });
+        const opacityMap = [1.0, 0.75, 0.50, 0.25];
+        const curOp = settings.get_double('opacity');
+        opacityRow.selected = opacityMap.indexOf(curOp);
+        if (opacityRow.selected < 0) opacityRow.selected = 0;
+        opacityRow.connect('notify::selected', () => {
+            settings.set_double('opacity', opacityMap[opacityRow.selected]);
+        });
+        appearanceGroup.add(opacityRow);
+
         const layoutGroup = new Adw.PreferencesGroup({ title: 'Layout' });
         page.add(layoutGroup);
 
@@ -49,6 +62,16 @@ export default class EveKeyboardPrefs extends ExtensionPreferences {
             settings.set_string('layout', layoutMap[layoutRow.selected]);
         });
         layoutGroup.add(layoutRow);
+
+        const layoutModeRow = new Adw.ComboRow({
+            title: 'Layout mode',
+            model: new Gtk.StringList({ strings: ['Full', 'Tenkeyless', '75%', 'Minimal'] }),
+        });
+        layoutModeRow.selected = Math.min(settings.get_int('layout-mode'), 3);
+        layoutModeRow.connect('notify::selected', () => {
+            settings.set_int('layout-mode', layoutModeRow.selected);
+        });
+        layoutGroup.add(layoutModeRow);
 
         const behaviorGroup = new Adw.PreferencesGroup({ title: 'Behavior' });
         page.add(behaviorGroup);

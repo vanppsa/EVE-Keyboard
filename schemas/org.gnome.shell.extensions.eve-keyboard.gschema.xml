@@ -13,9 +13,19 @@
       <description>'S', 'M', or 'L'</description>
     </key>
     <key name="layout" type="s">
-      <default>'auto'</default>
+      <default>'us'</default>
       <summary>Keyboard layout</summary>
       <description>'auto', 'us', or 'br'</description>
+    </key>
+    <key name="layout-mode" type="i">
+      <default>0</default>
+      <summary>Keyboard layout mode</summary>
+      <description>0=full, 1=tenkeyless, 2=75percent, 3=minimal</description>
+    </key>
+    <key name="opacity" type="d">
+      <default>1.0</default>
+      <summary>Keyboard opacity</summary>
+      <description>1.0=opaque, 0.75, 0.50, 0.25</description>
     </key>
     <key name="auto-show" type="b">
       <default>true</default>
