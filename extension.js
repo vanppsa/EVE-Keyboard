@@ -26,7 +26,7 @@ const LAYOUTS = {
                 { l: 'Tab', k: 65289, w: 1.5 }, { l: 'Q', k: 113 }, { l: 'W', k: 119 },
                 { l: 'E', k: 101 }, { l: 'R', k: 114 }, { l: 'T', k: 116 }, { l: 'Y', k: 121 },
                 { l: 'U', k: 117 }, { l: 'I', k: 105 }, { l: 'O', k: 111 }, { l: 'P', k: 112 },
-                { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '\\', k: 92, s: 124, w: 1.5 },
+                { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '', k: 92, s: 124, w: 1.5 },
             ],
             [
                 { l: 'Caps', k: 65509, w: 1.75, sp: 'caps' }, { l: 'A', k: 97 }, { l: 'S', k: 115 },
@@ -42,7 +42,7 @@ const LAYOUTS = {
             ],
             [
                 { l: 'Ctrl', k: 65507, w: 1.5, sp: 'ctrl' }, { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
-                { l: 'Espaço', k: 32, w: 6.5 },
+                { l: 'Space', k: 32, w: 6.5 },
                 { l: 'Alt', k: 65514, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.5 },
                 { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
             ],
@@ -62,7 +62,7 @@ const LAYOUTS = {
                 { l: 'Tab', k: 65289, w: 1.5 }, { l: 'Q', k: 113 }, { l: 'W', k: 119 },
                 { l: 'E', k: 101 }, { l: 'R', k: 114 }, { l: 'T', k: 116 }, { l: 'Y', k: 121 },
                 { l: 'U', k: 117 }, { l: 'I', k: 105 }, { l: 'O', k: 111 }, { l: 'P', k: 112 },
-                { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '\\', k: 92, s: 124, w: 1.5 },
+                { l: '[', k: 91, s: 123 }, { l: ']', k: 93, s: 125 }, { l: '', k: 92, s: 124, w: 1.5 },
             ],
             [
                 { l: 'Caps', k: 65509, w: 1.75, sp: 'caps' }, { l: 'A', k: 97 }, { l: 'S', k: 115 },
@@ -78,7 +78,7 @@ const LAYOUTS = {
             ],
             [
                 { l: 'Ctrl', k: 65507, w: 1.5, sp: 'ctrl' }, { l: 'Alt', k: 65513, w: 1.25, sp: 'alt' },
-                { l: 'Espaço', k: 32, w: 5.5 },
+                { l: 'Space', k: 32, w: 5.5 },
                 { l: 'AltGr', k: 65027, w: 1.25 }, { l: 'Ctrl', k: 65508, w: 1.5 },
                 { l: '←', k: 65361 }, { l: '↑', k: 65362 }, { l: '↓', k: 65364 }, { l: '→', k: 65363 },
             ],
@@ -239,7 +239,7 @@ export default class EveKeyboard extends Extension {
         title.add_style_class_name('vkbd-accessible');
         bar.add_child(title);
 
-        const layoutBtn = this._hBtn(this._currentLayout.toUpperCase(), 'Trocar layout');
+        const layoutBtn = this._hBtn(this._currentLayout.toUpperCase(), 'Change layout');
         layoutBtn.add_style_class_name('vkbd-layout-btn');
         layoutBtn.connect('clicked', () => {
             this._currentLayout = this._currentLayout === 'us' ? 'br' : 'us';
@@ -248,7 +248,7 @@ export default class EveKeyboard extends Extension {
         });
         bar.add_child(layoutBtn);
 
-        const sizeMap = { 'S': 'Teclas pequenas', 'M': 'Teclas médias', 'L': 'Teclas grandes' };
+        const sizeMap = { 'S': 'Small keys', 'M': 'Medium keys', 'L': 'Large keys' };
         for (const [lbl, sz] of Object.entries(SIZES)) {
             const b = this._hBtn(lbl, sizeMap[lbl]);
             b.connect('clicked', () => {
@@ -259,19 +259,19 @@ export default class EveKeyboard extends Extension {
             bar.add_child(b);
         }
 
-        this._themeBtn = this._hBtn(this._dark ? '☀' : '🌙', 'Tema claro/escuro');
+        this._themeBtn = this._hBtn(this._dark ? '☀' : '🌙', 'Toggle light/dark theme');
         this._themeBtn.connect('clicked', () => this._toggleTheme());
         bar.add_child(this._themeBtn);
 
-        this._dragBtn = this._hBtn('✥', 'Mover teclado');
+        this._dragBtn = this._hBtn('✥', 'Move keyboard');
         this._dragBtn.connect('button-press-event', () => this._startDrag());
         bar.add_child(this._dragBtn);
 
-        this._resizeBtn = this._hBtn('⤡', 'Redimensionar');
+        this._resizeBtn = this._hBtn('⤡', 'Resize');
         this._resizeBtn.connect('button-press-event', () => this._startResize());
         bar.add_child(this._resizeBtn);
 
-        const closeBtn = this._hBtn('✕', 'Fechar teclado');
+        const closeBtn = this._hBtn('✕', 'Close keyboard');
         closeBtn.add_style_class_name('vkbd-close');
         closeBtn.connect('clicked', () => { this._panel.visible = false; });
         bar.add_child(closeBtn);
@@ -370,7 +370,6 @@ export default class EveKeyboard extends Extension {
                     const d = this._resizeState;
                     const dx = x - d.sx;
                     
-                    // Ajusta escala baseada no movimento horizontal (300px = 1.0 de variação)
                     this._scale = Math.max(0.5, Math.min(2.0, d.baseScale + (dx / 300)));
                     this._applyScale();
                     this._settings.set_double('panel-scale', this._scale);
@@ -470,10 +469,10 @@ export default class EveKeyboard extends Extension {
         if (this._alt) this._vkbd.notify_keyval(t++, 65513, Clutter.KeyState.PRESSED);
 
         let kv = def.k;
-        const isLetter = (kv >= 97 && kv <= 122) || kv === 231; // a-z ou ç
+        const isLetter = (kv >= 97 && kv <= 122) || kv === 231; 
         if (isLetter) {
             if (this._shift !== this._caps) {
-                if (kv === 231) kv = 199; // Ç
+                if (kv === 231) kv = 199; 
                 else kv -= 32;
             }
         } else if (this._shift && def.s != null) {

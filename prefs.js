@@ -12,12 +12,12 @@ export default class EveKeyboardPrefs extends ExtensionPreferences {
         const page = new Adw.PreferencesPage();
         window.add(page);
 
-        const appearanceGroup = new Adw.PreferencesGroup({ title: 'Aparência' });
+        const appearanceGroup = new Adw.PreferencesGroup({ title: 'Appearance' });
         page.add(appearanceGroup);
 
         const themeRow = new Adw.ComboRow({
-            title: 'Tema',
-            model: new Gtk.StringList({ strings: ['Escuro', 'Claro'] }),
+            title: 'Theme',
+            model: new Gtk.StringList({ strings: ['Dark', 'Light'] }),
         });
         themeRow.selected = settings.get_string('theme') === 'dark' ? 0 : 1;
         themeRow.connect('notify::selected', () => {
@@ -26,8 +26,8 @@ export default class EveKeyboardPrefs extends ExtensionPreferences {
         appearanceGroup.add(themeRow);
 
         const sizeRow = new Adw.ComboRow({
-            title: 'Tamanho das teclas',
-            model: new Gtk.StringList({ strings: ['Pequeno (S)', 'Médio (M)', 'Grande (L)'] }),
+            title: 'Key size',
+            model: new Gtk.StringList({ strings: ['Small (S)', 'Medium (M)', 'Large (L)'] }),
         });
         const sizeMap = ['S', 'M', 'L'];
         sizeRow.selected = sizeMap.indexOf(settings.get_string('key-size'));
@@ -40,8 +40,8 @@ export default class EveKeyboardPrefs extends ExtensionPreferences {
         page.add(layoutGroup);
 
         const layoutRow = new Adw.ComboRow({
-            title: 'Layout do teclado',
-            model: new Gtk.StringList({ strings: ['Automático', 'QWERTY US', 'ABNT2 BR'] }),
+            title: 'Keyboard layout',
+            model: new Gtk.StringList({ strings: ['Automatic', 'QWERTY US', 'ABNT2 BR'] }),
         });
         const layoutMap = ['auto', 'us', 'br'];
         layoutRow.selected = layoutMap.indexOf(settings.get_string('layout'));
@@ -50,19 +50,19 @@ export default class EveKeyboardPrefs extends ExtensionPreferences {
         });
         layoutGroup.add(layoutRow);
 
-        const behaviorGroup = new Adw.PreferencesGroup({ title: 'Comportamento' });
+        const behaviorGroup = new Adw.PreferencesGroup({ title: 'Behavior' });
         page.add(behaviorGroup);
 
         const autoShowRow = new Adw.SwitchRow({
-            title: 'Mostrar automaticamente',
-            subtitle: 'Exibir o teclado ao focar um campo de texto',
+            title: 'Auto-show',
+            subtitle: 'Show keyboard when focusing a text input',
         });
         settings.bind('auto-show', autoShowRow, 'active', Gio.SettingsBindFlags.DEFAULT);
         behaviorGroup.add(autoShowRow);
 
         const stickyRow = new Adw.SwitchRow({
-            title: 'Modificadores sticky',
-            subtitle: 'Shift/Ctrl/Alt soltam após pressionar 1 tecla',
+            title: 'Sticky modifiers',
+            subtitle: 'Shift/Ctrl/Alt release after 1 key press',
         });
         settings.bind('sticky-modifiers', stickyRow, 'active', Gio.SettingsBindFlags.DEFAULT);
         behaviorGroup.add(stickyRow);
@@ -76,7 +76,7 @@ export default class EveKeyboardPrefs extends ExtensionPreferences {
             monitorModel.append(`Monitor ${i + 1}`);
 
         const monitorRow = new Adw.ComboRow({
-            title: 'Monitor padrão',
+            title: 'Default monitor',
             model: monitorModel,
         });
         monitorRow.selected = Math.min(settings.get_int('monitor-index'), monCount - 1);

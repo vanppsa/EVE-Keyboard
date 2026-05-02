@@ -1,65 +1,65 @@
-# EVE Keyboard — Estado do Projeto
+# EVE Keyboard — Project Status
 
-## Fase Atual: CONCLUÍDA até Fase 4 (aguardando teste real)
+## Current Phase: COMPLETED up to Phase 4 (awaiting real testing)
 
-O projeto está completo em código. Todas as 4 fases foram implementadas.
-**Falta fazer logout/login para testar a extensão no GNOME Shell.**
-
----
-
-## Fases Concluídas
-
-### Fase 1 — Correções Críticas ✅
-- API do backend: `Clutter.get_default_backend()` → `Meta.get_backend()`
-- Caps Lock: removido duplo toggle (agora é modifier interno apenas)
-- Indicator: `St.Button` em `_rightBox` → `PanelMenu.Button` + `addToStatusArea()`
-- Posição: hard-coded 670px → `this._panel.width` dinâmico
-- Space: label vazio → "Espaço"
-- Bug fix: `kv + 1` no release → `kv` correto
-
-### Fase 2 — Layout e Input ✅
-- Layout ABNT2 BR com detecção automática via `org.gnome.desktop.input-sources`
-- Botão US/BR no header para trocar layout manualmente
-- Dead keys: composição de acentos (ã, á, â, ä)
-- Auto-repeat: 400ms delay, 80ms intervalo
-- Classe CSS `.vkbd-dead` (roxo) para tecla morta ativa
-
-### Fase 3 — Preferências e GSettings ✅
-- `schemas/org.gnome.shell.extensions.eve-keyboard.gschema.xml` (8 chaves)
-- `prefs.js` com GTK4/libadwaita (ComboRow + SwitchRow)
-- Multi-monitor: escolha do monitor via GSettings
-- Posição salva: persiste x/y ao arrastar e restaura no login
-- Acessibilidade: classe `vkbd-accessible` nas teclas
-
-### Fase 4 — Auto-show e Settings em tempo real ✅
-- Auto-show: teclado aparece ao focar campo de texto via `Main.inputMethod`
-- Settings watch: mudanças em tempo real (tema, layout, monitor)
-- Sticky configurável: on/off via preferências
+The project is code-complete. All 4 phases have been implemented.
+**Requires logout/login to test the extension in GNOME Shell.**
 
 ---
 
-## Após logout/login — Testar
+## Completed Phases
+
+### Phase 1 — Critical Fixes ✅
+- Backend API: `Clutter.get_default_backend()` → `Meta.get_backend()`
+- Caps Lock: removed double toggle (now an internal modifier only)
+- Indicator: `St.Button` in `_rightBox` → `PanelMenu.Button` + `addToStatusArea()`
+- Position: hard-coded 670px → dynamic `this._panel.width`
+- Space: empty label → "Space"
+- Bug fix: `kv + 1` on release → correct `kv`
+
+### Phase 2 — Layout and Input ✅
+- ABNT2 BR layout with automatic detection via `org.gnome.desktop.input-sources`
+- US/BR button in header for manual layout switching
+- Dead keys: accent composition (ã, á, â, ä)
+- Auto-repeat: 400ms delay, 80ms interval
+- CSS class `.vkbd-dead` (purple) for active dead key
+
+### Phase 3 — Preferences and GSettings ✅
+- `schemas/org.gnome.shell.extensions.eve-keyboard.gschema.xml` (8 keys)
+- `prefs.js` with GTK4/libadwaita (ComboRow + SwitchRow)
+- Multi-monitor: monitor selection via GSettings
+- Saved position: persists x/y on drag and restores on login
+- Accessibility: `vkbd-accessible` class on keys
+
+### Phase 4 — Auto-show and Real-time Settings ✅
+- Auto-show: keyboard appears when focusing a text field via `Main.inputMethod`
+- Settings watch: real-time changes (theme, layout, monitor)
+- Configurable sticky modifiers: on/off via preferences
+
+---
+
+## After logout/login — Testing
 
 1. `gnome-extensions enable eve-keyboard@local`
-2. Verificar se o ícone ⌨ aparece no painel
-3. Testar: mostrar/esconder, arrastar, teclas normais, modificadores
-4. Testar: trocar layout US/BR, dead keys (no layout BR: ~ + a = ã)
-5. Testar: auto-repeat (segurar uma tecla)
-6. Testar: preferências (`gnome-extensions prefs eve-keyboard@local`)
+2. Verify the ⌨ icon appears in the panel
+3. Test: show/hide, drag, normal keys, modifiers
+4. Test: switch US/BR layout, dead keys (on BR layout: ~ + a = ã)
+5. Test: auto-repeat (hold a key)
+6. Test: preferences (`gnome-extensions prefs eve-keyboard@local`)
 7. Debug: `journalctl -f -o cat /usr/bin/gnome-shell | grep -i eve`
 
 ---
 
-## Problemas Conhecidos (para investigar após teste)
+## Known Issues (to investigate after testing)
 
-- `Main.inputMethod` pode não estar disponível em todos os contextos
-- `Main.layoutManager.removeChrome()` — verificar se a API correta no GNOME 50 é `_removeChrome` ou `removeChrome`
-- Dead keys cobrem apenas til, agudo, circunflexo, trema (falta cedilha direto, crase)
-- Não sincroniza modifier state com teclado físico
+- `Main.inputMethod` might not be available in all contexts
+- `Main.layoutManager.removeChrome()` — check if the correct API in GNOME 50 is `_removeChrome` or `removeChrome`
+- Dead keys only cover tilde, acute, circumflex, umlaut (missing direct cedilla, grave accent)
+- Modifier state not synchronized with physical keyboard
 
 ---
 
-## Arquivos
+## Files
 
 ```
 ~/.local/share/gnome-shell/extensions/eve-keyboard@local/
@@ -72,7 +72,7 @@ O projeto está completo em código. Todas as 4 fases foram implementadas.
     └── gschemas.compiled
 
 ~/Documentos/PROJETOS/EVE Keyboard/
-├── PLANNING.md (este arquivo)
+├── PLANNING.md (this file)
 ├── README.md
 ├── extension.js
 ├── prefs.js
@@ -83,11 +83,11 @@ O projeto está completo em código. Todas as 4 fases foram implementadas.
 
 ---
 
-## Roadmap Futuro
+## Future Roadmap
 
-- Mais layouts (AZERTY, DVORAK)
-- Sincronização de modifiers com teclado físico
+- More layouts (AZERTY, DVORAK)
+- Modifier synchronization with physical keyboard
 - i18n (gettext)
-- Mais dead keys (crase `, cedilha Ç direto)
-- Auto-hide quando nenhum campo de texto está focado
-- Drag-resize por touch/pinch
+- More dead keys (grave accent `, direct cedilla Ç)
+- Auto-hide when no text field is focused
+- Drag-resize via touch/pinch

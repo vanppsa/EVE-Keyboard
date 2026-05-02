@@ -1,68 +1,68 @@
-# Guia de Engenharia — EVE Keyboard
+# Engineering Guide — EVE Keyboard
 
-Este documento é o manual definitivo sobre o funcionamento interno da extensão. Ele cobre desde a injeção de eventos até a inteligência de UI.
+This document is the definitive manual on the extension's inner workings, covering everything from event injection to UI intelligence.
 
 ---
 
-## 🛠️ Subsistemas Técnicos
+## 🛠️ Technical Subsystems
 
-### 1. Injeção de Input (Virtual Device)
-A extensão atua como um driver de hardware virtual.
-- **`Clutter.VirtualInputDevice`**: Criado a partir do *Seat* padrão do backend. Ele injeta `keyval` diretamente no fluxo de eventos do GNOME Shell.
-- **Fluxo de Evento**: Cada clique em uma tecla gera um `notify_keyval` com estado `PRESSED` seguido imediatamente por `RELEASED`.
-- **Monotonic Time**: Usamos `GLib.get_monotonic_time()` para garantir que os eventos tenham timestamps precisos, evitando que o sistema os ignore como ruído.
+### 1. Input Injection (Virtual Device)
+The extension acts as a virtual hardware driver.
+- **`Clutter.VirtualInputDevice`**: Created from the backend's default *Seat*. It injects `keyval` directly into the GNOME Shell event stream.
+- **Event Flow**: Each key press generates a `notify_keyval` with `PRESSED` state, immediately followed by `RELEASED`.
+- **Monotonic Time**: We use `GLib.get_monotonic_time()` to ensure events have precise timestamps, preventing the system from ignoring them as noise.
 
-### 2. Sistema de Auto-Repeat
-Implementado manualmente via timers do GLib para simular o comportamento de um teclado físico.
-- **Delay (400ms)**: Ao segurar uma tecla, aguardamos este tempo antes de iniciar a repetição.
-- **Intervalo (80ms)**: Velocidade da repetição contínua.
-- **Segurança**: O `_repeatId` garante que, se você soltar a tecla ou mover o mouse para fora dela, a repetição pare instantaneamente, evitando teclas presas.
+### 2. Auto-Repeat System
+Manually implemented via GLib timers to simulate physical keyboard behavior.
+- **Delay (400ms)**: When holding a key, we wait this duration before initiating repetition.
+- **Interval (80ms)**: Speed of continuous repetition.
+- **Safety**: The `_repeatId` ensures that if you release the key or move the mouse out of its area, repetition stops instantly, preventing stuck keys.
 
-### 3. Modificadores e "Sticky Keys"
-Gerencia o estado de Shift, Caps Lock, Ctrl e Alt.
-- **Sticky Behavior**: Se `sticky-modifiers` estiver ativo, o Shift/Ctrl/Alt solta automaticamente após a próxima tecla comum ser pressionada.
-- **Lógica de Símbolos**: O sistema verifica o estado do Shift para decidir se envia o caractere base (`k`) ou o símbolo secundário (`s`) definido no layout.
+### 3. Modifiers and "Sticky Keys"
+Manages the state of Shift, Caps Lock, Ctrl, and Alt.
+- **Sticky Behavior**: If `sticky-modifiers` is active, Shift/Ctrl/Alt releases automatically after the next common key is pressed.
+- **Symbol Logic**: The system checks the Shift state to decide whether to send the base character (`k`) or the secondary symbol (`s`) defined in the layout.
 
-### 4. Inteligência de Layout (Auto-Detection)
-O método `_resolveLayout` tenta ser inteligente:
-1. Verifica se o usuário forçou um layout nas configurações.
-2. Se estiver em `auto`, ele lê o GSettings do sistema (`org.gnome.desktop.input-sources`).
-3. Se encontrar `br` na lista de idiomas do usuário, ele ativa o ABNT2 automaticamente.
+### 4. Layout Intelligence (Auto-Detection)
+The `_resolveLayout` method aims for intelligence:
+1. Checks if the user has forced a layout in settings.
+2. If set to `auto`, it reads the system's GSettings (`org.gnome.desktop.input-sources`).
+3. If it finds `br` in the user's language list, it automatically activates the ABNT2 layout.
 
 ### 5. Auto-Show (Focus Tracker)
-Utiliza o `Main.inputMethod` para monitorar o foco global.
-- Quando `has-focus` muda para verdadeiro (ex: clicou em um terminal ou navegador), a extensão verifica se a opção de mostrar automaticamente está ligada e exibe o painel.
+Utilizes `Main.inputMethod` to monitor global focus.
+- When `has-focus` changes to true (e.g., clicking on a terminal or browser), the extension checks if the auto-show option is enabled and displays the panel.
 
 ---
 
-## 📐 Interface e Renderização
+## 📐 Interface and Rendering
 
-### Gerenciamento de Camadas (Chrome)
-O teclado é adicionado via `Main.layoutManager.addTopChrome`.
-- **Por que TopChrome?** Isso garante que o teclado fique acima de todas as janelas (incluindo janelas em tela cheia), mas permite que menus de sistema fiquem sobre ele se necessário.
-- **Escalabilidade**: O método `set_scale` do Clutter é usado para o redimensionamento, o que é computacionalmente mais leve do que alterar o tamanho de cada botão individualmente.
+### Layer Management (Chrome)
+The keyboard is added via `Main.layoutManager.addTopChrome`.
+- **Why TopChrome?** This ensures the keyboard stays above all windows (including full-screen ones), but allows system menus to overlay it if necessary.
+- **Scalability**: Clutter's `set_scale` method is used for resizing, which is computationally lighter than altering each button's size individually.
 
-### Posicionamento Persistente
-- As coordenadas `X` e `Y` são salvas no GSettings toda vez que o arrasto termina.
-- **Multi-monitor**: O teclado utiliza o `monitor-index` para saber em qual tela deve aparecer. Se as coordenadas salvas estiverem fora da tela (ex: você desconectou um monitor), ele reseta para o centro da tela primária.
+### Persistent Positioning
+- `X` and `Y` coordinates are saved to GSettings every time dragging finishes.
+- **Multi-monitor**: The keyboard uses `monitor-index` to know which screen it should appear on. If saved coordinates are off-screen (e.g., you disconnected a monitor), it resets to the center of the primary screen.
 
 ---
 
-## 🧪 Notas para Desenvolvedores
+## 🧪 Notes for Developers
 
-### Adicionando Inteligência às Teclas
-As teclas possuem propriedades especiais no objeto `LAYOUTS`:
-- `w`: Multiplicador de largura (ex: `1.5` para Tab).
-- `sp`: Identificador especial (ex: `shift`, `caps`) para disparar lógica de estado.
-- `dd`: Marca a tecla como *Dead Key* (necessária para acentos).
-- `s`: Símbolo de Shift (caractere enviado quando Shift está ativo).
+### Adding Intelligence to Keys
+Keys have special properties in the `LAYOUTS` object:
+- `w`: Width multiplier (e.g., `1.5` for Tab).
+- `sp`: Special identifier (e.g., `shift`, `caps`) to trigger state logic.
+- `dd`: Marks the key as a *Dead Key* (required for accents).
+- `s`: Shift symbol (character sent when Shift is active).
 
-### Debugando Estados de Input
-Para ver exatamente o que a extensão está injetando:
+### Debugging Input States
+To see exactly what the extension is injecting:
 ```bash
 libinput debug-events
 ```
-(Isso mostrará os eventos de teclado vindo do dispositivo virtual criado pela extensão).
+(This will show keyboard events coming from the virtual device created by the extension).
 
 ---
-*Este documento deve ser atualizado sempre que uma nova lógica central for implementada.*
+*This document should be updated whenever new core logic is implemented.*

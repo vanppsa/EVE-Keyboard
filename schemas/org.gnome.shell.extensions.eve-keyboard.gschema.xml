@@ -4,42 +4,42 @@
           path="/org/gnome/shell/extensions/eve-keyboard/">
     <key name="theme" type="s">
       <default>'dark'</default>
-      <summary>Tema do teclado</summary>
-      <description>'dark' ou 'light'</description>
+      <summary>Keyboard theme</summary>
+      <description>'dark' or 'light'</description>
     </key>
     <key name="key-size" type="s">
       <default>'M'</default>
-      <summary>Tamanho das teclas</summary>
-      <description>'S', 'M' ou 'L'</description>
+      <summary>Key size</summary>
+      <description>'S', 'M', or 'L'</description>
     </key>
     <key name="layout" type="s">
       <default>'auto'</default>
-      <summary>Layout do teclado</summary>
-      <description>'auto', 'us' ou 'br'</description>
+      <summary>Keyboard layout</summary>
+      <description>'auto', 'us', or 'br'</description>
     </key>
     <key name="auto-show" type="b">
       <default>true</default>
-      <summary>Mostrar automaticamente ao focar campo de texto</summary>
+      <summary>Auto-show when focusing text input</summary>
     </key>
     <key name="sticky-modifiers" type="b">
       <default>true</default>
-      <summary>Modificadores sticky (soltam após 1 tecla)</summary>
+      <summary>Sticky modifiers (release after 1 key)</summary>
     </key>
     <key name="panel-x" type="i">
       <default>-1</default>
-      <summary>Posição X do painel (-1 = centralizado)</summary>
+      <summary>Panel X position (-1 = centered)</summary>
     </key>
     <key name="panel-y" type="i">
       <default>-1</default>
-      <summary>Posição Y do painel (-1 = bottom center)</summary>
+      <summary>Panel Y position (-1 = bottom center)</summary>
     </key>
     <key name="monitor-index" type="i">
         <default>0</default>
-        <summary>Índice do monitor onde o teclado aparece</summary>
+        <summary>Index of the monitor where the keyboard appears</summary>
     </key>
     <key name="panel-scale" type="d">
         <default>1.0</default>
-        <summary>Escala do teclado (1.0 = 100%, 0.8 = 80%, 1.2 = 120%)</summary>
+        <summary>Keyboard scale (1.0 = 100%, 0.8 = 80%, 1.2 = 120%)</summary>
     </key>
   </schema>
 </schemalist>

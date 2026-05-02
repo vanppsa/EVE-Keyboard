@@ -1,90 +1,90 @@
-# EVE Keyboard — Teclado Virtual para GNOME Shell
+# EVE Keyboard — Virtual Keyboard for GNOME Shell
 
-O **EVE Keyboard** é uma extensão de teclado virtual de alto desempenho para o GNOME Shell (versão 47/50+), projetada especificamente para o **Fedora 44** e sessões **Wayland**.
+The **EVE Keyboard** is a high-performance virtual keyboard extension for GNOME Shell (version 47/50+), specifically designed for **Fedora 44** and **Wayland** sessions.
 
-Diferente de teclados baseados em janelas comuns, o EVE Keyboard roda diretamente dentro do compositor (GNOME Shell), garantindo que ele sempre apareça sobre qualquer janela, tela de bloqueio ou menu do sistema, utilizando a API Clutter para injeção de input de baixo nível.
-
----
-
-## ✨ Destaques
-
-- 🚀 **Otimizado para Wayland**: Injeção de teclas via `VirtualInputDevice`.
-- 📐 **Redimensionamento Livre**: Arraste o canto do teclado para ajustar a escala (0.5x a 2.0x).
-- 🖱️ **Posicionamento Persistente**: Arraste e posicione onde quiser; o teclado lembra o local na próxima sessão.
-- 🎨 **Interface Moderna**: Segue o design do GNOME com temas claro e escuro automáticos.
-- ⌨️ **Layouts Híbridos**: Suporte completo para **US (QWERTY)** e **BR (ABNT2)** com dead keys (acentuação).
-- ⚡ **Auto-Show**: O teclado aparece automaticamente ao focar em campos de texto (opcional).
+Unlike common window-based keyboards, the EVE Keyboard runs directly within the GNOME Shell compositor. This ensures it always appears above any window, the lock screen, or system menus, utilizing the Clutter API for low-level input injection.
 
 ---
 
-## 🛠️ Instalação no Fedora 44
+## ✨ Highlights
 
-### 1. Dependências do Sistema
-Certifique-se de ter as ferramentas necessárias para compilar os schemas de configuração:
+- 🚀 **Wayland Optimized**: Key injection via `VirtualInputDevice`.
+- 📐 **Free Resizing**: Drag the keyboard's corner to adjust its scale (0.5x to 2.0x).
+- 🖱️ **Persistent Positioning**: Drag and position it anywhere; the keyboard remembers its location for the next session.
+- 🎨 **Modern UI**: Follows GNOME design principles with automatic light and dark themes.
+- ⌨️ **Hybrid Layouts**: Full support for **US (QWERTY)** and **BR (ABNT2)** with dead keys (accentuation).
+- ⚡ **Auto-Show**: The keyboard automatically appears when focusing text fields (optional).
+
+---
+
+## 🛠️ Installation on Fedora 44
+
+### 1. System Dependencies
+Ensure you have the necessary tools to compile the configuration schemas:
 
 ```bash
 sudo dnf install glib2-devel gnome-extensions-app
 ```
 
-### 2. Instalação Rápida (Script)
-Execute o bloco abaixo no seu terminal para baixar, instalar e configurar a extensão automaticamente:
+### 2. Quick Installation (Script)
+Run the block below in your terminal to download, install, and configure the extension automatically:
 
 ```bash
-# Definir o ID da extensão
+# Define the extension ID
 UUID="eve-keyboard@local"
 DEST="$HOME/.local/share/gnome-shell/extensions/$UUID"
 
-# Criar diretórios e copiar arquivos
+# Create directories and copy files
 mkdir -p "$DEST"
 cp -r . "$DEST/"
 
-# Compilar os schemas de configuração
+# Compile schema configurations
 glib-compile-schemas "$DEST/schemas/"
 
-# Ativar a extensão
+# Enable the extension
 gnome-extensions enable "$UUID"
 ```
 
-### 3. Reinicie o GNOME Shell
-Como o EVE Keyboard é uma extensão do sistema, é necessário reiniciar a sessão para que o Shell carregue o novo código:
-- Salve seu trabalho e faça **Logout** e **Login** novamente.
+### 3. Restart GNOME Shell
+As EVE Keyboard is a system extension, you need to restart your session for the Shell to load the new code:
+- Save your work and **Log Out**, then **Log In** again.
 
 ---
 
-## 🚀 Como Usar
+## 🚀 How to Use
 
-1. **Ativação**: Um ícone de teclado (**⌨**) aparecerá no painel superior (systray).
-2. **Mover**: Clique e segure no ícone de "setas" no cabeçalho do teclado para arrastá-lo.
-3. **Escalar**: Use o botão de redimensionamento no canto inferior direito para ajustar o tamanho.
-4. **Troca de Layout**: Clique no indicador de idioma (`US` / `BR`) para alternar instantaneamente.
-5. **Acentuação**: Funciona como um teclado físico (ex: pressione `~` e depois `A` para obter `ã`).
+1.  **Activation**: A keyboard icon (**⌨**) will appear in the top panel (systray).
+2.  **Move**: Click and hold the "arrows" icon in the keyboard header to drag it.
+3.  **Scale**: Use the resize handle in the bottom-right corner to adjust the size.
+4.  **Layout Switch**: Click the language indicator (`US` / `BR`) to switch instantly.
+5.  **Accents**: Works like a physical keyboard (e.g., press `~` then `A` to get `ã`).
 
-### Preferências
-Você pode ajustar o comportamento do **Auto-Show**, escala padrão e comportamentos de teclas abrindo as configurações:
+### Preferences
+You can adjust the **Auto-Show** behavior, default scale, and key behaviors by opening the preferences:
 ```bash
 gnome-extensions prefs eve-keyboard@local
 ```
 
 ---
 
-## 👨‍💻 Desenvolvimento e Contribuição
+## 👨‍💻 Development and Contribution
 
-Se você deseja modificar o teclado ou adicionar novos layouts:
+If you wish to modify the keyboard or add new layouts:
 
-**Logs de Erro:**
+**Error Logs:**
 ```bash
 journalctl -f -o cat /usr/bin/gnome-shell | grep -i eve
 ```
 
-**Testar em Sessão Aninhada (sem deslogar):**
+**Test in Nested Session (without logging out):**
 ```bash
 dbus-run-session -- gnome-shell --nested &
 ```
 
 ---
 
-## 📄 Licença
-Este projeto está sob a licença MIT. Sinta-se à vontade para usar, modificar e distribuir.
+## 📄 License
+This project is under the MIT license. Feel free to use, modify, and distribute.
 
 ---
-*Desenvolvido para a comunidade GNOME.*
+*Developed for the GNOME community.*

@@ -1,59 +1,59 @@
-# EVE Keyboard — Instruções do Assistente
+# EVE Keyboard — Assistant Instructions
 
-Este projeto é uma extensão do GNOME Shell (versão 50+) que implementa um teclado virtual otimizado para Wayland. Ele roda diretamente no compositor, garantindo que fique sempre acima das janelas e tenha acesso ao input de baixo nível via Clutter.
+This project is a GNOME Shell extension (version 50+) that implements an optimized virtual keyboard for Wayland. It runs directly within the compositor, ensuring it always stays above windows and has access to low-level input via Clutter.
 
-## Visão Geral do Projeto
+## Project Overview
 
-- **Tecnologias:** JavaScript (GJS), GNOME Shell API (Clutter, St, Main), GTK4/Libadwaita (Preferências), GSettings, CSS.
-- **Arquitetura:** Segue o padrão de extensões modernas do GNOME (ESM), utilizando a classe `Extension` como ponto de entrada.
-- **Destaques:** Injeção de teclas via `VirtualInputDevice`, suporte a layouts US/BR (ABNT2), dead keys para acentuação, posicionamento persistente e redimensionamento dinâmico.
+- **Technologies:** JavaScript (GJS), GNOME Shell API (Clutter, St, Main), GTK4/Libadwaita (Preferences), GSettings, CSS.
+- **Architecture:** Follows the modern GNOME extension pattern (ESM), using the `Extension` class as the entry point.
+- **Highlights:** Key injection via `VirtualInputDevice`, US/BR (ABNT2) layout support, dead keys for accentuation, persistent positioning, and dynamic resizing.
 
-## Estrutura de Arquivos Chave
+## Key File Structure
 
-- `extension.js`: Lógica principal, gerenciamento de janelas, renderização do teclado e injeção de input.
-- `prefs.js`: Interface de configurações utilizando GTK4 e Libadwaita.
-- `stylesheet.css`: Definições visuais para os temas claro e escuro.
-- `metadata.json`: Metadados da extensão (UUID, versão do shell, etc).
-- `schemas/`: Contém o schema XML para o GSettings (`org.gnome.shell.extensions.eve-keyboard.gschema.xml`).
+- `extension.js`: Core logic, window management, keyboard rendering, and input injection.
+- `prefs.js`: Settings interface using GTK4 and Libadwaita.
+- `stylesheet.css`: Visual definitions for light and dark themes.
+- `metadata.json`: Extension metadata (UUID, shell version, etc).
+- `schemas/`: Contains the GSettings XML schema (`org.gnome.shell.extensions.eve-keyboard.gschema.xml`).
 
-## Comandos Úteis
+## Useful Commands
 
-### Instalação e Ativação
+### Installation and Activation
 ```bash
-# Copiar para a pasta de extensões do usuário
+# Copy to the user's extensions folder
 mkdir -p ~/.local/share/gnome-shell/extensions/eve-keyboard@local
 cp -r . ~/.local/share/gnome-shell/extensions/eve-keyboard@local/
 
-# Compilar schemas (obrigatório após mudanças no XML)
+# Compile schemas (required after changes to XML)
 glib-compile-schemas ~/.local/share/gnome-shell/extensions/eve-keyboard@local/schemas/
 
-# Ativar a extensão
+# Activate the extension
 gnome-extensions enable eve-keyboard@local
 ```
 
-### Desenvolvimento e Debug
+### Development and Debugging
 ```bash
-# Visualizar logs em tempo real
+# View real-time logs
 journalctl -f -o cat /usr/bin/gnome-shell | grep -i eve
 
-# Abrir janela de preferências
+# Open preferences window
 gnome-extensions prefs eve-keyboard@local
 
-# Testar em sessão aninhada (sem precisar fazer logout)
+# Test in a nested session (without needing to log out)
 dbus-run-session -- gnome-shell --nested &
 ```
 
-## Convenções de Desenvolvimento
+## Development Conventions
 
-- **JS Moderno:** Utilize imports ESM e a estrutura de classe `Extension`.
-- **Estilização:** Todas as classes CSS devem começar com o prefixo `vkbd-` para evitar conflitos com o shell.
-- **GSettings:** Sempre adicione novas chaves no arquivo `.gschema.xml` antes de usá-las no código e lembre-se de recompilar o schema.
-- **Layouts:** Os layouts são definidos no objeto `LAYOUTS` dentro de `extension.js`. Cada tecla possui um `label` (l), `keyval` (k) e opcionalmente um símbolo de shift (s) ou largura (w).
-- **Dead Keys:** A composição de acentos é gerenciada pelo `DEAD_KEY_MAP`. Se adicionar novos acentos, certifique-se de mapear as combinações de letras.
+- **Modern JS:** Use ESM imports and the `Extension` class structure.
+- **Styling:** All CSS classes must start with the `vkbd-` prefix to avoid conflicts with the shell.
+- **GSettings:** Always add new keys in the `.gschema.xml` file before using them in the code, and remember to recompile the schema.
+- **Layouts:** Layouts are defined in the `LAYOUTS` object within `extension.js`. Each key has a `label` (l), `keyval` (k), and optionally a shift symbol (s) or width (w).
+- **Dead Keys:** Accent composition is managed by `DEAD_KEY_MAP`. If you add new accents, ensure you map the letter combinations.
 
-## Checklist de Alterações
+## Changes Checklist
 
-1. Se alterar o CSS, verifique tanto o tema `.vkbd-dk` (dark) quanto `.vkbd-lt` (light).
-2. Se adicionar uma nova configuração, atualize o `gschema.xml`, o `prefs.js` e a lógica de leitura em `extension.js`.
-3. Ao adicionar layouts, verifique se os keyvals do Clutter estão corretos.
-4. Sempre teste o redimensionamento e o posicionamento após mudanças na estrutura do `St.BoxLayout`.
+1. If changing CSS, check both `.vkbd-dk` (dark) and `.vkbd-lt` (light) themes.
+2. If adding a new setting, update `gschema.xml`, `prefs.js`, and the reading logic in `extension.js`.
+3. When adding layouts, verify that Clutter keyvals are correct.
+4. Always test resizing and positioning after changes to the `St.BoxLayout` structure.
