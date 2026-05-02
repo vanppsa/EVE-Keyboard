@@ -105,10 +105,15 @@
 }
 
 .vkbd-content {
-    spacing: 12px;
+  spacing: 12px;
 }
+
+.vkbd-nav {
+  spacing: 3px;
+}
+
 .vkbd-numpad {
-    spacing: 3px;
+  spacing: 3px;
 }
 
 .vkbd-resize-active {

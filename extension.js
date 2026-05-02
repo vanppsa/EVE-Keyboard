@@ -490,100 +490,89 @@ export default class EveKeyboard extends Extension {
         const savedX = this._settings.get_int('panel-x');
         const savedY = this._settings.get_int('panel-y');
 
-        if (savedX >= 0 && savedY >= 0) {
-            this._panel.set_position(savedX, savedY);
-        } else {
-            const [width] = this._panel.get_preferred_width(-1);
-            this._panel.set_position(
-                Math.round((mon.width - width) / 2),
-                mon.height - POS_Y_OFFSET
-            );
-        }
+    if (savedX >= 0 && savedY >= 0) {
+      const sw = this._panel.width * this._scale;
+      const sh = this._panel.height * this._scale;
+      if (savedX + sw > mon.x + mon.width || savedY + sh > mon.y + mon.height ||
+          savedX < mon.x || savedY < mon.y) {
+        this._scale = 1.0;
+        this._settings.set_double('panel-scale', 1.0);
+        this._panel.set_position(
+          Math.round((mon.width - this._panel.width) / 2),
+          mon.height - POS_Y_OFFSET
+        );
+        this._settings.set_int('panel-x', -1);
+        this._settings.set_int('panel-y', -1);
+      } else {
+        this._panel.set_position(savedX, savedY);
+      }
+    } else {
+      const [width] = this._panel.get_preferred_width(-1);
+      this._panel.set_position(
+        Math.round((mon.width - width) / 2),
+        mon.height - POS_Y_OFFSET
+      );
+    }
 
         this._panel.visible = false;
         this._applyScale();
         this._setupDrag();
     }
 
-    _buildFullLayout() {
-        const layout = LAYOUTS[this._currentLayout];
+  _buildFullLayout() {
+    const layout = LAYOUTS[this._currentLayout];
 
-        for (const row of layout.mainRows) {
-            const box = new St.BoxLayout({ style_class: 'vkbd-row' });
-            for (const def of row) {
-                const btn = this._mkKey(def);
-                box.add_child(btn);
-                this._keys.push({ btn, def });
-            }
-
-            if (layout.hasNav) {
-                const rowIdx = layout.mainRows.indexOf(row);
-                if (rowIdx === 0 && layout.navRows[0]) {
-                    for (const def of layout.navRows[0]) {
-                        const btn = this._mkKey(def);
-                        box.add_child(btn);
-                        this._keys.push({ btn, def });
-                    }
-                } else if (rowIdx === 1 && layout.navRows[1]) {
-                    for (const def of layout.navRows[1]) {
-                        const btn = this._mkKey(def);
-                        box.add_child(btn);
-                        this._keys.push({ btn, def });
-                    }
-                }
-            }
-
-            this._panel.add_child(box);
-        }
-
-        if (layout.hasNumpad && layout.numpadRows) {
-            const numpadBox = new St.BoxLayout({
-                style_class: 'vkbd-numpad',
-                vertical: true,
-            });
-            for (const row of layout.numpadRows) {
-                const box = new St.BoxLayout({ style_class: 'vkbd-row' });
-                for (const def of row) {
-                    const btn = this._mkKey(def);
-                    box.add_child(btn);
-                    this._keys.push({ btn, def });
-                }
-                numpadBox.add_child(box);
-            }
-
-            const contentRow = new St.BoxLayout({ style_class: 'vkbd-content' });
-            const mainBox = new St.BoxLayout({ vertical: true });
-
-            let childIdx = 0;
-            let panelChild = null;
-            for (const ch of this._panel.get_children()) {
-                if (childIdx >= 1) {
-                    mainBox.add_child(ch);
-                }
-                childIdx++;
-            }
-
-            while (this._panel.get_children().length > 1) {
-                const ch = this._panel.get_last_child();
-                if (ch !== this._panel.get_first_child()) {
-                    this._panel.remove_child(ch);
-                    mainBox.add_child(ch);
-                } else {
-                    break;
-                }
-            }
-
-            while (this._panel.get_children().length > 1) {
-                const ch = this._panel.get_last_child();
-                this._panel.remove_child(ch);
-                mainBox.insert_child_at_index(ch, 0);
-            }
-
-            contentRow.add_child(mainBox);
-            contentRow.add_child(numpadBox);
-            this._panel.add_child(contentRow);
-        }
+    const mainBox = new St.BoxLayout({ vertical: true });
+    for (const row of layout.mainRows) {
+      const box = new St.BoxLayout({ style_class: 'vkbd-row' });
+      for (const def of row) {
+        const btn = this._mkKey(def);
+        box.add_child(btn);
+        this._keys.push({ btn, def });
+      }
+      mainBox.add_child(box);
     }
+
+    const navBox = new St.BoxLayout({
+      style_class: 'vkbd-nav',
+      vertical: true,
+    });
+    if (layout.hasNav && layout.navRows) {
+      for (const navRow of layout.navRows) {
+        const box = new St.BoxLayout({ style_class: 'vkbd-row' });
+        for (const def of navRow) {
+          const btn = this._mkKey(def);
+          box.add_child(btn);
+          this._keys.push({ btn, def });
+        }
+        navBox.add_child(box);
+      }
+    }
+
+    const numpadBox = new St.BoxLayout({
+      style_class: 'vkbd-numpad',
+      vertical: true,
+    });
+    if (layout.hasNumpad && layout.numpadRows) {
+      for (const row of layout.numpadRows) {
+        const box = new St.BoxLayout({ style_class: 'vkbd-row' });
+        for (const def of row) {
+          const btn = this._mkKey(def);
+          box.add_child(btn);
+          this._keys.push({ btn, def });
+        }
+        numpadBox.add_child(box);
+      }
+    }
+
+    const contentRow = new St.BoxLayout({ style_class: 'vkbd-content' });
+    contentRow.add_child(mainBox);
+    if (navBox.get_n_children() > 0)
+      contentRow.add_child(navBox);
+    if (numpadBox.get_n_children() > 0)
+      contentRow.add_child(numpadBox);
+    this._panel.add_child(contentRow);
+  }
 
     _buildSimpleLayout(rows) {
         for (const row of rows) {
@@ -742,23 +731,24 @@ export default class EveKeyboard extends Extension {
         }
     }
 
-    _rebuildKbd() {
-        const wasVisible = this._panel?.visible ?? false;
-        const posX = this._panel?.x;
-        const posY = this._panel?.y;
+  _rebuildKbd() {
+    const wasVisible = this._panel?.visible ?? false;
+    const posX = this._panel?.x;
+    const posY = this._panel?.y;
 
-        if (this._panel) {
-            Main.layoutManager.removeChrome(this._panel);
-            this._panel.destroy();
-        }
-        this._buildKbd();
-
-        if (posX !== undefined && posY !== undefined) {
-            this._panel.set_position(posX, posY);
-        }
-
-        this._panel.visible = wasVisible;
+    if (this._panel) {
+      Main.layoutManager.removeChrome(this._panel);
+      this._panel.destroy();
     }
+    this._buildKbd();
+
+    if (posX !== undefined && posY !== undefined) {
+      this._panel.set_position(posX, posY);
+    }
+    this._clampToMonitor();
+
+    this._panel.visible = wasVisible;
+  }
 
     _startDrag() {
         const [sx, sy] = global.get_pointer();
@@ -776,14 +766,14 @@ export default class EveKeyboard extends Extension {
                 if (this._dragState) {
                     const d = this._dragState;
                     this._panel.set_position(d.ox + x - d.sx, d.oy + y - d.sy);
-                } else if (this._resizeState) {
-                    const d = this._resizeState;
-                    const dx = x - d.sx;
+      } else if (this._resizeState) {
+        const d = this._resizeState;
+        const dx = x - d.sx;
 
-                    this._scale = Math.max(0.5, Math.min(2.0, d.baseScale + (dx / 300)));
-                    this._applyScale();
-                    this._settings.set_double('panel-scale', this._scale);
-                }
+        this._scale = Math.max(d.minScale, Math.min(d.maxScale, d.baseScale + (dx / 300)));
+        this._applyScale();
+        this._settings.set_double('panel-scale', this._scale);
+      }
                 return Clutter.EVENT_STOP;
             }
             if (t === Clutter.EventType.BUTTON_RELEASE) {
@@ -799,24 +789,24 @@ export default class EveKeyboard extends Extension {
         }));
     }
 
-    _clampToMonitor() {
-        if (!this._panel) return;
-        const mon = this._getTargetMonitor();
-        let x = this._panel.x;
-        let y = this._panel.y;
-        const w = this._panel.width;
-        const h = this._panel.height;
+  _clampToMonitor() {
+    if (!this._panel) return;
+    const mon = this._getTargetMonitor();
+    let x = this._panel.x;
+    let y = this._panel.y;
+    const sw = this._panel.width * this._scale;
+    const sh = this._panel.height * this._scale;
 
-        if (x < mon.x) x = mon.x;
-        if (y < mon.y) y = mon.y;
-        if (x + w > mon.x + mon.width) x = mon.x + mon.width - w;
-        if (y + h > mon.y + mon.height) y = mon.y + mon.height - h;
+    if (x + sw > mon.x + mon.width) x = mon.x + mon.width - sw;
+    if (y + sh > mon.y + mon.height) y = mon.y + mon.height - sh;
+    if (x < mon.x) x = mon.x;
+    if (y < mon.y) y = mon.y;
 
-        if (x !== this._panel.x || y !== this._panel.y) {
-            this._panel.set_position(x, y);
-            this._savePosition();
-        }
+    if (x !== this._panel.x || y !== this._panel.y) {
+      this._panel.set_position(Math.round(x), Math.round(y));
+      this._savePosition();
     }
+  }
 
     _savePosition() {
         if (!this._panel || !this._settings) return;
@@ -1001,32 +991,34 @@ export default class EveKeyboard extends Extension {
         this._refresh();
     }
 
-    _applySize() {
-        for (const { btn, def } of this._keys)
-            btn.set_size(this._size * (def.w ?? 1), this._size * (def.h ?? 1));
+  _applySize() {
+    for (const { btn, def } of this._keys)
+      btn.set_size(this._size * (def.w ?? 1), this._size * (def.h ?? 1));
 
-        const mon = this._getTargetMonitor();
-        this._panel.set_position(
-            Math.round((mon.width - this._panel.width) / 2),
-            mon.height - POS_Y_OFFSET
-        );
-        this._savePosition();
-    }
+    this._clampToMonitor();
+  }
 
-    _startResize() {
-        const [sx, sy] = global.get_pointer();
-        this._panel.add_style_class_name('vkbd-resize-active');
-        this._resizeState = {
-            sx,
-            sy,
-            baseScale: this._scale,
-        };
-    }
+  _startResize() {
+    const [sx, sy] = global.get_pointer();
+    const mon = this._getTargetMonitor();
+    const availW = (mon.x + mon.width) - this._panel.x;
+    const availH = (mon.y + mon.height) - this._panel.y;
+    const maxScaleW = availW / this._panel.width;
+    const maxScaleH = availH / this._panel.height;
+    this._panel.add_style_class_name('vkbd-resize-active');
+    this._resizeState = {
+      sx, sy,
+      baseScale: this._scale,
+      maxScale: Math.min(2.0, maxScaleW, maxScaleH),
+      minScale: Math.max(0.5, 100 / Math.max(1, this._panel.width)),
+    };
+  }
 
-    _applyScale() {
-        if (!this._panel) return;
-        this._panel.set_scale(this._scale, this._scale);
-    }
+  _applyScale() {
+    if (!this._panel) return;
+    this._panel.set_scale(this._scale, this._scale);
+    this._clampToMonitor();
+  }
 
     _buildIndicator() {
         this._indicator = new PanelMenu.Button(0.0, 'EVE Keyboard', true);
