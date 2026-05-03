@@ -640,8 +640,8 @@ _calcBlockHeight(rows, U, GAP) {
         const vBox = new St.BoxLayout({
             style_class: 'vkbd-block',
             vertical: true,
+            y_expand: true,
         });
-        vBox.set_style(`-st-spacing: ${GAP}px;`);
 
         let maxW = 0;
 
@@ -676,11 +676,6 @@ _calcBlockHeight(rows, U, GAP) {
             const rw = this._rowWidthPx(row, U, GAP);
             if (rw > maxW) maxW = rw;
         }
-        const spacerHeight = totalHeight - navH - arrowH - GAP * 2;
-        const spacer = new St.Widget({ style_class: 'vkbd-nav-spacer' });
-        spacer.set_size(maxW, Math.max(0, spacerHeight));
-        spacer.y_expand = true;
-        vBox.add_child(spacer);
 
         const arrowWidget = new St.Widget({ style_class: 'vkbd-arrows' });
         const rowYArrow = [];
@@ -702,9 +697,22 @@ _calcBlockHeight(rows, U, GAP) {
             }
         }
         arrowWidget.set_size(maxW, arrowH);
+        arrowWidget.y_expand = false;
+        arrowWidget.y_align = Clutter.ActorAlign.END;
         vBox.add_child(arrowWidget);
 
-        vBox.set_size(maxW, totalHeight);
+        const neededHeight = navH + arrowH + GAP;
+        const spacerHeight = totalHeight - neededHeight;
+        const spacer = new St.Widget({ style_class: 'vkbd-nav-spacer' });
+        spacer.y_expand = true;
+        spacer.x_expand = false;
+        if (spacerHeight > 0) {
+            spacer.set_size(maxW, spacerHeight);
+        }
+        vBox.add_child(spacer);
+
+        const vBoxHeight = Math.max(totalHeight, neededHeight);
+        vBox.set_size(maxW, vBoxHeight);
 
         return vBox;
     }
