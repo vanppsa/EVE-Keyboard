@@ -696,11 +696,6 @@ _calcBlockHeight(rows, U, GAP) {
                 x += keyPx(def.w ?? 1, U, GAP) + GAP;
             }
         }
-        arrowWidget.set_size(maxW, arrowH);
-        arrowWidget.y_expand = false;
-        arrowWidget.y_align = Clutter.ActorAlign.END;
-        vBox.add_child(arrowWidget);
-
         const neededHeight = navH + arrowH + GAP;
         const spacerHeight = totalHeight - neededHeight;
         const spacer = new St.Widget({ style_class: 'vkbd-nav-spacer' });
@@ -710,6 +705,9 @@ _calcBlockHeight(rows, U, GAP) {
             spacer.set_size(maxW, spacerHeight);
         }
         vBox.add_child(spacer);
+
+        arrowWidget.set_size(maxW, arrowH);
+        vBox.add_child(arrowWidget);
 
         const vBoxHeight = Math.max(totalHeight, neededHeight);
         vBox.set_size(maxW, vBoxHeight);
@@ -900,14 +898,42 @@ _hBtn(label, tooltip = '') {
 _mkKey(def, U, GAP) {
     const w = def.w ?? 1;
     const h = def.h ?? 1;
+    const pxW = keyPx(w, U, GAP);
+    const pxH = keyPx(h, U, GAP);
     const btn = new St.Button({
-        label: def.l,
         can_focus: false,
         style_class: this._keyCls(def, false),
-        width: keyPx(w, U, GAP),
-        height: keyPx(h, U, GAP),
+        width: pxW,
+        height: pxH,
     });
     btn.add_style_class_name('vkbd-accessible');
+
+    if (def.s !== undefined) {
+        const labelBox = new St.BoxLayout({
+            vertical: true,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+            width: pxW,
+            height: pxH,
+        });
+        const topLabel = new St.Label({
+            text: String.fromCharCode(def.s),
+            style_class: 'vkbd-key-shiftsym',
+            x_expand: false,
+            y_expand: false,
+        });
+        const bottomLabel = new St.Label({
+            text: def.l,
+            style_class: 'vkbd-key-mainsym',
+            x_expand: false,
+            y_expand: false,
+        });
+        labelBox.add_child(topLabel);
+        labelBox.add_child(bottomLabel);
+        btn.add_child(labelBox);
+    } else {
+        btn.set_label(def.l);
+    }
 
     btn.connect('button-press-event', () => {
         this._stopRepeat();

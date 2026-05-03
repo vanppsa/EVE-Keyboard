@@ -68,6 +68,15 @@
 .vkbd-k-lt:hover { background-color: #ebebef; }
 .vkbd-k-lt:active { background-color: #d1d1d8; }
 
+.vkbd-key-shiftsym {
+    font-size: 0.65em;
+    color: inherit;
+}
+.vkbd-key-mainsym {
+    font-size: 1em;
+    color: inherit;
+}
+
 .vkbd-on {
     background-color: #1a73e8;
     color: #ffffff;
