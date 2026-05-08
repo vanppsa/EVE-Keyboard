@@ -17,37 +17,52 @@ Unlike common window-based keyboards, the EVE Keyboard runs directly within the 
 
 ---
 
-## 🛠️ Installation on Fedora 44
+## 🛠️ Installation
+
+> [!WARNING]  
+> **GNOME EXCLUSIVE:** This is a GNOME Shell extension. It will **NOT** work on KDE Plasma, XFCE, Cinnamon, or any other desktop environment.
 
 ### 1. System Dependencies
-Ensure you have the necessary tools to compile the configuration schemas:
+The extension requires `glib-compile-schemas` to work properly. If it is missing, the extension will silently fail.
+Install it depending on your distribution:
 
+- **Fedora/RHEL:** `sudo dnf install glib2-devel gnome-extensions-app`
+- **Ubuntu/Debian:** `sudo apt install libglib2.0-dev gnome-shell-extension-prefs`
+- **Arch Linux:** `sudo pacman -S glib2`
+
+### 2. Install (Choose one method)
+
+**Method A: Using the Install Script (Recommended)**
+Simply run the installation script in the project root:
 ```bash
-sudo dnf install glib2-devel gnome-extensions-app
+bash install.sh
 ```
 
-### 2. Quick Installation (Script)
-Run the block below in your terminal to download, install, and configure the extension automatically:
-
+**Method B: Using Makefile**
+If you prefer using `make`:
 ```bash
-# Define the extension ID
-UUID="eve-keyboard@local"
-DEST="$HOME/.local/share/gnome-shell/extensions/$UUID"
-
-# Create directories and copy files
-mkdir -p "$DEST"
-cp -r . "$DEST/"
-
-# Compile schema configurations
-glib-compile-schemas "$DEST/schemas/"
-
-# Enable the extension
-gnome-extensions enable "$UUID"
+make install
 ```
 
-### 3. Restart GNOME Shell
-As EVE Keyboard is a system extension, you need to restart your session for the Shell to load the new code:
-- Save your work and **Log Out**, then **Log In** again.
+### 3. IMPORTANT: Restart GNOME Session
+Because EVE Keyboard is a system extension, GNOME needs to detect the newly copied files.
+- **On Wayland (Default on modern Fedora/Ubuntu):** You **MUST** save your work, **Log Out** of your user account, and **Log In** again.
+- **On X11 (Older systems):** You can press `Alt+F2`, type `r`, and press `Enter`.
+
+### 4. Troubleshooting (Common Errors)
+
+**Error: "glib-compile-schemas not found"**
+The `install.sh` script will stop and show this if you skipped step 1. You must install the GLib2 development package for your distribution (see Step 1).
+
+**Error: "gnome-extensions command not found"**
+The script will copy the files correctly but won't be able to enable the extension via terminal.
+**Fix:** Install the GUI app to manage extensions (`sudo dnf install gnome-extensions-app` or `sudo apt install gnome-shell-extension-prefs`), then open the "Extensions" app in your system menu and turn on "EVE Keyboard".
+
+**The extension doesn't show up after installation!**
+You probably forgot to **Log Out** and **Log In** (Step 3). Wayland does not hot-reload new system extensions.
+
+### 5. Official GNOME Extensions Store
+*(Planned)* Soon you will be able to install this extension with a single click from [extensions.gnome.org](https://extensions.gnome.org/).
 
 ---
 
